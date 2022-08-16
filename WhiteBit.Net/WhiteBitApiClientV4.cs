@@ -13,7 +13,11 @@ namespace WhiteBit.Net
 {
     public class WhiteBitApiClientV4 : WhiteBitApiClient, IWhiteBitApiClientV4
     {
+        #region endpoints
+        private const string TickerUrl = "public/ticker";
+        private const string AssetsUrl = "public/assets";
 
+        #endregion
         public WhiteBitApiClientV4(string name, BaseRestClientOptions options, RestApiClientOptions apiOptions, Log log, WhiteBitClient client) : base(name, options, apiOptions, log, client)
         {
         }
@@ -24,10 +28,10 @@ namespace WhiteBit.Net
         public event Action<OrderId>? OnOrderCanceled;
 
 
-        internal Uri GetUrl(string endpoint)
-        {
-            return new Uri(BaseAddress.AppendPath($"v{ApiVersion}"));
-        }
+        // internal Uri GetUrl(string endpoint)
+        // {
+        //     return new Uri(BaseAddress.AppendPath($"v{ApiVersion}"));
+        // }
 
 
         public Task<WebCallResult<OrderId>> CancelOrderAsync(string orderId, string? symbol = null, CancellationToken ct = default)
@@ -110,14 +114,14 @@ namespace WhiteBit.Net
             throw new NotImplementedException();
         }
 
-        protected override AuthenticationProvider CreateAuthenticationProvider(ApiCredentials credentials)
+        protected override Task<WebCallResult<DateTime>> GetServerTimestampAsync()
         {
             throw new NotImplementedException();
         }
 
-        protected override Task<WebCallResult<DateTime>> GetServerTimestampAsync()
+        protected override AuthenticationProvider CreateAuthenticationProvider(ApiCredentials credentials)
         {
-            throw new NotImplementedException();
+            return new WhiteBitAuthenticationProvider(credentials);
         }
     }
 }
