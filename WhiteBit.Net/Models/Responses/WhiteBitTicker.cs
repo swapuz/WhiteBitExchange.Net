@@ -4,21 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using CryptoExchange.Net.CommonObjects;
 using Newtonsoft.Json;
+using WhiteBit.Net.Helpers;
 
 namespace WhiteBit.Net.Models.Responses
 {
     public class WhiteBitTicker : WhiteBitRawTicker
     {
-        WhiteBitTicker(){}
-        internal WhiteBitTicker(WhiteBitRawTicker baseInstance)
+        internal WhiteBitTicker(WhiteBitRawTicker baseInstance) : base(baseInstance)
         {
-            CoinmarketCapBaseId = baseInstance.CoinmarketCapBaseId;
-            CoinmarketCapQuoteId = baseInstance.CoinmarketCapQuoteId;
-            LastPrice = baseInstance.LastPrice;
-            Volume = baseInstance.Volume;
-            QuoteVolume = baseInstance.QuoteVolume;
-            IsFrozen = baseInstance.IsFrozen;
-            Change = baseInstance.Change;
         }
 
         public string? Symbol { get; set; }
@@ -34,8 +27,11 @@ namespace WhiteBit.Net.Models.Responses
             };
         }
     }
-    public class WhiteBitRawTicker
+    public class WhiteBitRawTicker : ReflectableParent<WhiteBitRawTicker>
     {
+        public WhiteBitRawTicker(WhiteBitRawTicker parent) : base(parent)
+        {
+        }
 
         /// <summary>
         /// CoinmarketCap Id of base currency; 0 - if unknown

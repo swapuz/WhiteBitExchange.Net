@@ -29,13 +29,20 @@ namespace WhiteBit.Net.Interfaces
         Task<WebCallResult<IEnumerable<WhiteBitTradingBalance>>> GetBalancesAsync(int requestWeight = 1, CancellationToken ct = default);
 
         /// <summary>
-        /// This endpoint retrieves a 24-hour pricing and volume summary for each market pair available on the exchange.
+        /// This method retrieves a 24-hour pricing and volume summary for each market pair available on the exchange.
         /// </summary>
         /// <param name="requestWeight"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<WebCallResult<IEnumerable<WhiteBitTicker>>> GetTickersAsync(int requestWeight = 1, CancellationToken ct = default);
 
+        /// <summary>
+        /// This method retrieves the assets status.
+        /// </summary>
+        /// <param name="requestWeight"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<WebCallResult<IEnumerable<WhiteBitAsset>>> GetAssetsAsync(int requestWeight= 1, CancellationToken ct = default);
 
     }
 }
