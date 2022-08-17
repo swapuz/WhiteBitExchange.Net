@@ -47,9 +47,12 @@ namespace WhiteBit.Net
             return result.As(result.Data.Select(b => new WhiteBitTradingBalance(b.Value) { Currency = b.Key }));
 
         }
-        public async Task<WebCallResult<Dictionary<string,WhiteBitTicker>>> GetTickersAsync(int requestWeight, CancellationToken ct = default)
+
+        ///<inheritdoc/>
+        public async Task<WebCallResult<IEnumerable<WhiteBitTicker>>> GetTickersAsync(int requestWeight, CancellationToken ct = default)
         {
-            return await SendRequestAsync<Dictionary<string,WhiteBitTicker>>(TickerUrl, ct, weight: requestWeight);
+            var result =  await SendRequestAsync<Dictionary<string,WhiteBitRawTicker>>(TickerUrl, ct, weight: requestWeight);
+            return result.As(result.Data.Select(b => new WhiteBitTicker(b.Value) { Symbol = b.Key }));
         }
         #endregion
 
