@@ -8,6 +8,7 @@ using CryptoExchange.Net.CommonObjects;
 using CryptoExchange.Net.Logging;
 using CryptoExchange.Net.Objects;
 using WhiteBit.Net.Interfaces;
+using WhiteBit.Net.Models.Responses;
 
 namespace WhiteBit.Net
 {
@@ -16,6 +17,7 @@ namespace WhiteBit.Net
         #region endpoints
         private const string TickerUrl = "public/ticker";
         private const string AssetsUrl = "public/assets";
+        private const string BalanceUrl = "trade-account/balance";
 
         #endregion
         public WhiteBitApiClientV4(string name, BaseRestClientOptions options, RestApiClientOptions apiOptions, Log log, WhiteBitClient client) : base(name, options, apiOptions, log, client)
@@ -23,17 +25,35 @@ namespace WhiteBit.Net
         }
 
         protected override string ApiVersion => "4";
+        internal static TimeSyncState TimeSyncState = new TimeSyncState("Spot Api");
+
 
         public event Action<OrderId>? OnOrderPlaced;
         public event Action<OrderId>? OnOrderCanceled;
 
+        #region IWhiteBitApiClientV4 Methods
+        ///<inheritdoc/>
+        public async Task<WebCallResult<WhiteBitTradingBalance>> GetBalanceAsync(string currency, int requestWeight = 1, CancellationToken ct = default)
+        {
+            currency = currency.ToUpper();
+            var result =  await SendRequestAsync<WhiteBitRawTradingBalance>(BalanceUrl, ct, weight: requestWeight, new Dictionary<string, object>{{"ticker", currency}});
+            return result.As(new WhiteBitTradingBalance(result.Data){Currency = currency});
+        }
+        
+        ///<inheritdoc/>
+        public async Task<WebCallResult<IEnumerable<WhiteBitTradingBalance>>> GetBalancesAsync(int requestWeight = 1, CancellationToken ct = default)
+        {
+            var result = await SendRequestAsync<Dictionary<string, WhiteBitRawTradingBalance>>(BalanceUrl, ct, weight: requestWeight);
+            return result.As(result.Data.Select(b => new WhiteBitTradingBalance(b.Value) { Currency = b.Key }));
 
-        // internal Uri GetUrl(string endpoint)
-        // {
-        //     return new Uri(BaseAddress.AppendPath($"v{ApiVersion}"));
-        // }
+        }
+        public async Task<WebCallResult<Dictionary<string,WhiteBitTicker>>> GetTickersAsync(int requestWeight, CancellationToken ct = default)
+        {
+            return await SendRequestAsync<Dictionary<string,WhiteBitTicker>>(TickerUrl, ct, weight: requestWeight);
+        }
+        #endregion
 
-
+        #region RestApiClient methods
         public Task<WebCallResult<OrderId>> CancelOrderAsync(string orderId, string? symbol = null, CancellationToken ct = default)
         {
             throw new NotImplementedException();
@@ -98,16 +118,16 @@ namespace WhiteBit.Net
         {
             throw new NotImplementedException();
         }
+        #endregion
 
+        #region RestApiClient methods
         public override TimeSpan GetTimeOffset()
         {
             throw new NotImplementedException();
         }
 
-        public override TimeSyncInfo GetTimeSyncInfo()
-        {
-            throw new NotImplementedException();
-        }
+        /// <inheritdoc />
+        public override TimeSyncInfo GetTimeSyncInfo() => new TimeSyncInfo(log,Options.AutoTimestamp, Options.TimestampRecalculationInterval, TimeSyncState);
 
         public Task<WebCallResult<OrderId>> PlaceOrderAsync(string symbol, CommonOrderSide side, CommonOrderType type, decimal quantity, decimal? price = null, string? accountId = null, string? clientOrderId = null, CancellationToken ct = default)
         {
@@ -122,6 +142,22 @@ namespace WhiteBit.Net
         protected override AuthenticationProvider CreateAuthenticationProvider(ApiCredentials credentials)
         {
             return new WhiteBitAuthenticationProvider(credentials);
+        }
+        #endregion
+        
+        private async Task<WebCallResult<T>> SendRequestAsync<T>(string endpoint, CancellationToken ct, int weight = 1, Dictionary<string, object>? request = null) where T : class
+        {
+            var isPublic = endpoint.IndexOf("public") > -1;
+            return await baseClient.SendRequestInternal<T>(
+                this,
+                GetUrl(endpoint),
+                isPublic ? HttpMethod.Get : HttpMethod.Post,
+                ct,
+                request,
+                AuthenticationProvider is not null,
+                isPublic ? HttpMethodParameterPosition.InUri : HttpMethodParameterPosition.InBody,
+                weight: weight
+            );
         }
     }
 }

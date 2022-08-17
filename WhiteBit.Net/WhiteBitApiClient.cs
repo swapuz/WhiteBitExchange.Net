@@ -19,6 +19,10 @@ namespace WhiteBit.Net
         protected abstract string ApiVersion { get; }
         public string ExchangeName { get; }
 
+        internal Uri GetUrl(string endpoint)
+        {
+            return new Uri(BaseAddress.AppendPath($"v{ApiVersion}").AppendPath(endpoint));
+        }
 
     }
 }
