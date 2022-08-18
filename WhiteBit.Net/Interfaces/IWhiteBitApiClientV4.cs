@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WhiteBit.Net.Models.Enums;
 using WhiteBit.Net.Models.Responses;
 
 namespace WhiteBit.Net.Interfaces
@@ -50,5 +51,18 @@ namespace WhiteBit.Net.Interfaces
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<WebCallResult<WhiteBitOrderBook>> GetOrderBookAsync(string symbol, int? depthLimit = null, int? AggregationLevel = null, CancellationToken ct = default);
+
+        /// <summary>
+        /// This method retrieves the trades that have been executed recently on the requested market.
+        /// </summary>
+        /// <param name="symbol">trading pair</param>
+        /// <param name="side">Can be buy or sell</param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<WebCallResult<List<WhiteBitPublicTrade>>> GetPublicTradesAsync(string symbol, WhiteBitOrderSide? side = null, CancellationToken ct = default);
+
+
+
+
     }
 }

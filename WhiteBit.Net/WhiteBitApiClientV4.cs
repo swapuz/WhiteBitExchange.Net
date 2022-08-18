@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using CryptoExchange.Net;
@@ -9,6 +10,7 @@ using CryptoExchange.Net.Interfaces.CommonClients;
 using CryptoExchange.Net.Logging;
 using CryptoExchange.Net.Objects;
 using WhiteBit.Net.Interfaces;
+using WhiteBit.Net.Models.Enums;
 using WhiteBit.Net.Models.Responses;
 
 namespace WhiteBit.Net
@@ -19,7 +21,13 @@ namespace WhiteBit.Net
         private const string TickerUrl = "public/ticker";
         private const string AssetsUrl = "public/assets";
         private const string OrderBookUrl = "public/orderbook/{market}";
+        private const string PublicTradesUrl = "public/trades/{market}";
+        private const string FeeUrl = "public/fee";
+        private const string ServerTimeUrl = "public/time";
+        private const string ServerPingUrl = "public/ping";
+        private const string FuturesListUrl = "public/futures";
         private const string BalanceUrl = "trade-account/balance";
+
 
         #endregion
         public WhiteBitApiClientV4(string name, BaseRestClientOptions options, RestApiClientOptions apiOptions, Log log, WhiteBitClient client) : base(name, options, apiOptions, log, client)
@@ -69,8 +77,22 @@ namespace WhiteBit.Net
             var param = new Dictionary<string, object>();
             param.AddOptionalParameter("limit", depthLimit);
             param.AddOptionalParameter("level", aggregationLevel);
-            return await SendRequestAsync<WhiteBitOrderBook>(FillPathParameter(OrderBookUrl, symbol), ct);
+            return await SendRequestAsync<WhiteBitOrderBook>(FillPathParameter(OrderBookUrl, symbol), ct, param);
         }
+        ///<inheritdoc/>
+        public async Task<WebCallResult<List<WhiteBitPublicTrade>>> GetPublicTradesAsync(string symbol, WhiteBitOrderSide? side = null, CancellationToken ct = default)
+        {
+            var param = new Dictionary<string, object>();
+            param.AddOptionalParameter("type", side?.ToString().ToLower());
+            return await SendRequestAsync<List<WhiteBitPublicTrade>>(FillPathParameter(PublicTradesUrl, symbol), ct, param);
+        }
+        ///<inheritdoc/>
+        public async Task<WebCallResult<List<WhiteBitFutures>>> GetFuturesAsync(CancellationToken ct = default)
+        {
+            return await SendRequestAsync<List<WhiteBitFutures>>(FillPathParameter(FuturesListUrl), ct);
+        }
+
+
         #endregion
 
         #region RestApiClient methods
@@ -121,7 +143,7 @@ namespace WhiteBit.Net
 
         public string GetSymbolName(string baseAsset, string quoteAsset)
         {
-            throw new NotImplementedException();
+            return $"{baseAsset}_{quoteAsset}".ToUpper(CultureInfo.InvariantCulture);
         }
 
         public Task<WebCallResult<IEnumerable<Symbol>>> GetSymbolsAsync(CancellationToken ct = default)
@@ -138,25 +160,23 @@ namespace WhiteBit.Net
         {
             throw new NotImplementedException();
         }
-        #endregion
-
-        #region RestApiClient methods
-        public override TimeSpan GetTimeOffset()
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <inheritdoc />
-        public override TimeSyncInfo GetTimeSyncInfo() => new TimeSyncInfo(log,Options.AutoTimestamp, Options.TimestampRecalculationInterval, TimeSyncState);
 
         public Task<WebCallResult<OrderId>> PlaceOrderAsync(string symbol, CommonOrderSide side, CommonOrderType type, decimal quantity, decimal? price = null, string? accountId = null, string? clientOrderId = null, CancellationToken ct = default)
         {
             throw new NotImplementedException();
         }
+        #endregion
 
-        protected override Task<WebCallResult<DateTime>> GetServerTimestampAsync()
+        #region RestApiClient methods
+        public override TimeSpan GetTimeOffset() => TimeSyncState.TimeOffset;
+
+        /// <inheritdoc />
+        public override TimeSyncInfo GetTimeSyncInfo() => new TimeSyncInfo(log,Options.AutoTimestamp, Options.TimestampRecalculationInterval, TimeSyncState);
+
+        protected override async Task<WebCallResult<DateTime>> GetServerTimestampAsync()
         {
-            throw new NotImplementedException();
+            var result = await SendRequestAsync<WhiteBitServerTime>(ServerTimeUrl);
+            return result.As(result.Data?.Time ?? default);
         }
 
         protected override AuthenticationProvider CreateAuthenticationProvider(ApiCredentials credentials)
@@ -165,7 +185,7 @@ namespace WhiteBit.Net
         }
         #endregion
         
-        private async Task<WebCallResult<T>> SendRequestAsync<T>(string endpoint, CancellationToken ct, Dictionary<string, object>? request = null) where T : class
+        private async Task<WebCallResult<T>> SendRequestAsync<T>(string endpoint, CancellationToken ct = default, Dictionary<string, object>? request = null) where T : class
         {
             var isPublic = endpoint.IndexOf("public") > -1;
             return await baseClient.SendRequestInternal<T>(
@@ -178,5 +198,12 @@ namespace WhiteBit.Net
                 isPublic ? HttpMethodParameterPosition.InUri : HttpMethodParameterPosition.InBody
             );
         }
+
+        #region test
+        public async Task<DateTime> GetServerTimestampTest()
+        {
+            return (await GetServerTimestampAsync()).Data;
+        }
+        #endregion
     }
 }
