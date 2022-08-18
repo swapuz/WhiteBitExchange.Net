@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CryptoExchange.Net;
 using CryptoExchange.Net.Authentication;
 using CryptoExchange.Net.CommonObjects;
+using CryptoExchange.Net.Interfaces.CommonClients;
 using CryptoExchange.Net.Logging;
 using CryptoExchange.Net.Objects;
 using WhiteBit.Net.Interfaces;
@@ -17,6 +18,7 @@ namespace WhiteBit.Net
         #region endpoints
         private const string TickerUrl = "public/ticker";
         private const string AssetsUrl = "public/assets";
+        private const string OrderBookUrl = "public/orderbook/{market}";
         private const string BalanceUrl = "trade-account/balance";
 
         #endregion
@@ -33,33 +35,41 @@ namespace WhiteBit.Net
 
         #region IWhiteBitApiClientV4 Methods
         ///<inheritdoc/>
-        public async Task<WebCallResult<WhiteBitTradingBalance>> GetBalanceAsync(string currency, int requestWeight = 1, CancellationToken ct = default)
+        public async Task<WebCallResult<WhiteBitTradingBalance>> GetBalanceAsync(string currency, CancellationToken ct = default)
         {
             currency = currency.ToUpper();
-            var result =  await SendRequestAsync<WhiteBitRawTradingBalance>(BalanceUrl, ct, weight: requestWeight, new Dictionary<string, object>{{"ticker", currency}});
+            var result =  await SendRequestAsync<WhiteBitRawTradingBalance>(BalanceUrl, ct, new Dictionary<string, object>{{"ticker", currency}});
             return result.As(new WhiteBitTradingBalance(result.Data){Currency = currency});
         }
         
         ///<inheritdoc/>
-        public async Task<WebCallResult<IEnumerable<WhiteBitTradingBalance>>> GetBalancesAsync(int requestWeight = 1, CancellationToken ct = default)
+        public async Task<WebCallResult<IEnumerable<WhiteBitTradingBalance>>> GetBalancesAsync(CancellationToken ct = default)
         {
-            var result = await SendRequestAsync<Dictionary<string, WhiteBitRawTradingBalance>>(BalanceUrl, ct, weight: requestWeight);
+            var result = await SendRequestAsync<Dictionary<string, WhiteBitRawTradingBalance>>(BalanceUrl, ct);
             return result.As(result.Data.Select(b => new WhiteBitTradingBalance(b.Value) { Currency = b.Key }));
 
         }
 
         ///<inheritdoc/>
-        public async Task<WebCallResult<IEnumerable<WhiteBitTicker>>> GetTickersAsync(int requestWeight = 1, CancellationToken ct = default)
+        public async Task<WebCallResult<IEnumerable<WhiteBitTicker>>> GetTickersAsync(CancellationToken ct = default)
         {
-            var result =  await SendRequestAsync<Dictionary<string,WhiteBitRawTicker>>(TickerUrl, ct, weight: requestWeight);
+            var result =  await SendRequestAsync<Dictionary<string,WhiteBitRawTicker>>(TickerUrl, ct);
             return result.As(result.Data.Select(b => new WhiteBitTicker(b.Value) { Symbol = b.Key }));
         }
 
         ///<inheritdoc/>
-        public async Task<WebCallResult<IEnumerable<WhiteBitAsset>>> GetAssetsAsync(int requestWeight = 1, CancellationToken ct = default)
+        public async Task<WebCallResult<IEnumerable<WhiteBitAsset>>> GetAssetsAsync(CancellationToken ct = default)
         {
-            var result = await SendRequestAsync<Dictionary<string, WhiteBitRawAsset>>(AssetsUrl, ct, weight: requestWeight);
+            var result = await SendRequestAsync<Dictionary<string, WhiteBitRawAsset>>(AssetsUrl, ct);
             return result.As(result.Data.Select(b => new WhiteBitAsset(b.Value) { Currency = b.Key }));
+        }
+        ///<inheritdoc/>
+        public async Task<WebCallResult<WhiteBitOrderBook>> GetOrderBookAsync(string symbol, int? depthLimit = null, int? aggregationLevel = null, CancellationToken ct = default)
+        {
+            var param = new Dictionary<string, object>();
+            param.AddOptionalParameter("limit", depthLimit);
+            param.AddOptionalParameter("level", aggregationLevel);
+            return await SendRequestAsync<WhiteBitOrderBook>(FillPathParameter(OrderBookUrl, symbol), ct);
         }
         #endregion
 
@@ -124,7 +134,7 @@ namespace WhiteBit.Net
             throw new NotImplementedException();
         }
 
-        public Task<WebCallResult<IEnumerable<Ticker>>> GetTickersAsync(CancellationToken ct = default)
+        Task<WebCallResult<IEnumerable<Ticker>>> IBaseRestClient.GetTickersAsync(CancellationToken ct)
         {
             throw new NotImplementedException();
         }
@@ -155,7 +165,7 @@ namespace WhiteBit.Net
         }
         #endregion
         
-        private async Task<WebCallResult<T>> SendRequestAsync<T>(string endpoint, CancellationToken ct, int weight = 1, Dictionary<string, object>? request = null) where T : class
+        private async Task<WebCallResult<T>> SendRequestAsync<T>(string endpoint, CancellationToken ct, Dictionary<string, object>? request = null) where T : class
         {
             var isPublic = endpoint.IndexOf("public") > -1;
             return await baseClient.SendRequestInternal<T>(
@@ -165,8 +175,7 @@ namespace WhiteBit.Net
                 ct,
                 request,
                 AuthenticationProvider is not null,
-                isPublic ? HttpMethodParameterPosition.InUri : HttpMethodParameterPosition.InBody,
-                weight: weight
+                isPublic ? HttpMethodParameterPosition.InUri : HttpMethodParameterPosition.InBody
             );
         }
     }

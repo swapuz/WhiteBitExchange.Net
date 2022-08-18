@@ -23,6 +23,26 @@ namespace WhiteBit.Net
         {
             return new Uri(BaseAddress.AppendPath($"v{ApiVersion}").AppendPath(endpoint));
         }
+        /// <summary>
+        /// Fill parameters in a path. Parameters are specified by '{}' and should be specified in occuring sequence
+        /// </summary>
+        /// <param name="path">The total path string</param>
+        /// <param name="values">The values to fill</param>
+        /// <returns></returns>
+        protected static string FillPathParameter(string path, params string[] values)
+        {
+            foreach (var value in values)
+            {
+                var indexB = path.IndexOf("{", StringComparison.Ordinal);
+                var indexE = path.IndexOf("}", StringComparison.Ordinal);
+                if (indexB >= 0 && indexE > indexB)
+                {
+                    path = path.Remove(indexB, indexE - indexB +1);
+                    path = path.Insert(indexB, value);
+                }
+            }
+            return path;
+        }
 
     }
 }
