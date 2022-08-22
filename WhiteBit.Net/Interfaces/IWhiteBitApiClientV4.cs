@@ -60,8 +60,18 @@ namespace WhiteBit.Net.Interfaces
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<WebCallResult<List<WhiteBitPublicTrade>>> GetPublicTradesAsync(string symbol, WhiteBitOrderSide? side = null, CancellationToken ct = default);
-
-
+        /// <summary>
+        /// This method returns the list of available futures markets.
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<WebCallResult<List<WhiteBitFutures>?>> GetFuturesAsync(CancellationToken ct = default);
+        /// <summary>
+        /// This method returns the list of markets that available for collateral trading
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<WebCallResult<List<string>>> GetCollateralMarketsAsync(CancellationToken ct = default);
 
 
     }

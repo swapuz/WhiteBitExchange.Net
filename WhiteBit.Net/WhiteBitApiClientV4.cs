@@ -26,6 +26,7 @@ namespace WhiteBit.Net
         private const string ServerTimeUrl = "public/time";
         private const string ServerPingUrl = "public/ping";
         private const string FuturesListUrl = "public/futures";
+        private const string CollateralMarketsUrl = "public/collateral/markets";
         private const string BalanceUrl = "trade-account/balance";
 
 
@@ -55,7 +56,6 @@ namespace WhiteBit.Net
         {
             var result = await SendRequestAsync<Dictionary<string, WhiteBitRawTradingBalance>>(BalanceUrl, ct);
             return result.As(result.Data.Select(b => new WhiteBitTradingBalance(b.Value) { Currency = b.Key }));
-
         }
 
         ///<inheritdoc/>
@@ -87,9 +87,15 @@ namespace WhiteBit.Net
             return await SendRequestAsync<List<WhiteBitPublicTrade>>(FillPathParameter(PublicTradesUrl, symbol), ct, param);
         }
         ///<inheritdoc/>
-        public async Task<WebCallResult<List<WhiteBitFutures>>> GetFuturesAsync(CancellationToken ct = default)
+        public async Task<WebCallResult<List<WhiteBitFutures>?>> GetFuturesAsync(CancellationToken ct = default)
         {
-            return await SendRequestAsync<List<WhiteBitFutures>>(FillPathParameter(FuturesListUrl), ct);
+            var result =  await SendRequestAsync<BaseResponse<List<WhiteBitFutures>>>(FuturesListUrl, ct);
+            return result.As(result.Data?.Result);
+        }
+        ///<inheritdoc/>
+        public async Task<WebCallResult<List<string>>> GetCollateralMarketsAsync(CancellationToken ct = default)
+        {
+            return await SendRequestAsync<List<string>>(CollateralMarketsUrl, ct);
         }
 
 

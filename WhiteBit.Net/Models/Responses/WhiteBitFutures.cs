@@ -44,7 +44,7 @@ namespace WhiteBit.Net.Models.Responses
         public WhiteBitProductType ProductType { get; set; }
 
         [JsonProperty("open_interest")]
-        public long OpenInterest { get; set; }
+        public decimal OpenInterest { get; set; }
 
         [JsonProperty("index_price")]
         public decimal IndexPrice { get; set; }
