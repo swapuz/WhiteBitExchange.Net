@@ -78,5 +78,14 @@ namespace WhiteBit.Net.Models.Responses
         /// </summary>
         [JsonProperty("dealFee")]
         public decimal DealFee { get; set; }
+        /// <summary>
+        ///  activation price
+        /// </summary>
+        [JsonProperty("activation_price")]
+        public decimal? ActivationPrice { get; set; }
+
+
+        [JsonProperty("price")]
+        public decimal? Price { get; set; }
     }
 }

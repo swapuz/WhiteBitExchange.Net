@@ -76,7 +76,7 @@ namespace WhiteBit.Net.Models.Requests
         /// </summary>
         /// <param name="symbol">Available market. Example: BTC_USDT</param>
         /// <param name="side">Order type. Variables: 'buy' / 'sell'</param>
-        /// <param name="amount">⚠️ ⚠️Amount of money (qoute) currency to buy or amount in stock (base) currency to sell. Example: 0.01 for buy and 0.0001 for sell.</param>
+        /// <param name="amount">⚠️ Amount of money (qoute) currency to buy or amount in stock (base) currency to sell. Example: 0.01 for buy and 0.0001 for sell.</param>
         /// <param name="activationPrice">Activation price in money currency. Example: 10000</param>
         /// <param name="clientOrderId">Identifier should be unique and contain letters, dashes or numbers. The identifier must be unique for the next 24 hours.</param>
         /// <returns></returns>
