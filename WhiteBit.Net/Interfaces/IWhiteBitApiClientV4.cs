@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WhiteBit.Net.Models.Enums;
+using WhiteBit.Net.Models.Requests;
 using WhiteBit.Net.Models.Responses;
 
 namespace WhiteBit.Net.Interfaces
@@ -72,7 +73,14 @@ namespace WhiteBit.Net.Interfaces
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<WebCallResult<List<string>>> GetCollateralMarketsAsync(CancellationToken ct = default);
-
+        /// <summary>
+        /// place order
+        /// </summary>
+        /// <param name="parameters">create the instance with one of static methods of WhiteBitPlaceOrderRequest class
+        /// i.g. `WhiteBitPlaceOrderRequest.CreateLimitOrderRequest()`</param>
+        /// <param name="ct"></param>
+        /// <returns>order model</returns>
+        Task<WebCallResult<WhiteBitOrder>> PlaceOrderAsync(WhiteBitPlaceOrderRequest parameters, CancellationToken ct = default);
 
     }
 }

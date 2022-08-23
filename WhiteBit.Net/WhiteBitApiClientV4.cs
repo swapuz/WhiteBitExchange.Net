@@ -9,8 +9,10 @@ using CryptoExchange.Net.CommonObjects;
 using CryptoExchange.Net.Interfaces.CommonClients;
 using CryptoExchange.Net.Logging;
 using CryptoExchange.Net.Objects;
+using WhiteBit.Net.Helpers;
 using WhiteBit.Net.Interfaces;
 using WhiteBit.Net.Models.Enums;
+using WhiteBit.Net.Models.Requests;
 using WhiteBit.Net.Models.Responses;
 
 namespace WhiteBit.Net
@@ -28,6 +30,11 @@ namespace WhiteBit.Net
         private const string FuturesListUrl = "public/futures";
         private const string CollateralMarketsUrl = "public/collateral/markets";
         private const string BalanceUrl = "trade-account/balance";
+        private const string PlaceLimitOrderUrl = "order/new";
+        private const string PlaceStopLimitOrderUrl = "order/stop_limit";
+        private const string PlaceMarketOrderUrl = "order/market";
+        private const string PlaceStopMarketOrderUrl = "order/stop_market";
+        private const string PlaceStockMarketOrderUrl = "order/stock_market";
 
 
         #endregion
@@ -97,7 +104,20 @@ namespace WhiteBit.Net
         {
             return await SendRequestAsync<List<string>>(CollateralMarketsUrl, ct);
         }
-
+        ///<inheritdoc/>
+        public async Task<WebCallResult<WhiteBitOrder>> PlaceOrderAsync(WhiteBitPlaceOrderRequest parameters ,CancellationToken ct = default)
+        {
+            var requestParam = parameters.AsDictionary();
+            return parameters.Type switch
+            {
+                WhiteBitOrderType.Limit => await SendRequestAsync<WhiteBitOrder>(PlaceLimitOrderUrl, ct, requestParam),
+                WhiteBitOrderType.Market => await SendRequestAsync<WhiteBitOrder>(PlaceMarketOrderUrl, ct, requestParam),
+                WhiteBitOrderType.StockMarket => await SendRequestAsync<WhiteBitOrder>(PlaceStockMarketOrderUrl, ct, requestParam),
+                WhiteBitOrderType.StopMarket => await SendRequestAsync<WhiteBitOrder>(PlaceStopMarketOrderUrl, ct, requestParam),
+                WhiteBitOrderType.StopLimit => await SendRequestAsync<WhiteBitOrder>(PlaceStopLimitOrderUrl, ct, requestParam),
+                _ => throw new ArgumentException("Unsupported order type")
+            };
+        }
 
         #endregion
 
