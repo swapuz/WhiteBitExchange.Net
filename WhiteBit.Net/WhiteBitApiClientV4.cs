@@ -9,6 +9,8 @@ using CryptoExchange.Net.CommonObjects;
 using CryptoExchange.Net.Interfaces.CommonClients;
 using CryptoExchange.Net.Logging;
 using CryptoExchange.Net.Objects;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using WhiteBit.Net.Helpers;
 using WhiteBit.Net.Interfaces;
 using WhiteBit.Net.Models.Enums;
@@ -35,6 +37,8 @@ namespace WhiteBit.Net
         private const string PlaceMarketOrderUrl = "order/market";
         private const string PlaceStopMarketOrderUrl = "order/stop_market";
         private const string PlaceStockMarketOrderUrl = "order/stock_market";
+        private const string CancelOrderUrl = "order/cancel";
+        private const string ActiveOrdersUrl = "orders";
 
 
         #endregion
@@ -118,11 +122,29 @@ namespace WhiteBit.Net
                 _ => throw new ArgumentException("Unsupported order type")
             };
         }
+        ///<inheritdoc/>
+        public async Task<WebCallResult<WhiteBitOrder>> CancelOrderAsync(string symbol, long orderId, CancellationToken ct = default)
+        {
+            var requestParam = new Dictionary<string, object>();
+            requestParam.Add("market", symbol);
+            requestParam.Add("orderId", orderId);
+            return await SendRequestAsync<WhiteBitOrder>(CancelOrderUrl, ct, requestParam);
+        }
+        ///<inheritdoc/>
+        public async Task<WebCallResult<List<WhiteBitOrder>>> GetActiveOrdersAsync(GetActiveOrdersRequest request, CancellationToken ct = default)
+        {
+            WebCallResult<JToken> result = await SendRequestAsync<JToken>(ActiveOrdersUrl, ct, request.AsDictionary());
+            if (result.Data is JArray array)
+            {
+                return result.As(array.ToObject<List<WhiteBitOrder>>()!);
+            }
+            return result.As<List<WhiteBitOrder>>(new List<WhiteBitOrder>() {result.Data.ToObject<WhiteBitOrder>()! });
+        }
 
         #endregion
 
         #region RestApiClient methods
-        public Task<WebCallResult<OrderId>> CancelOrderAsync(string orderId, string? symbol = null, CancellationToken ct = default)
+        Task<WebCallResult<OrderId>> IBaseRestClient.CancelOrderAsync(string orderId, string? symbol, CancellationToken ct)
         {
             throw new NotImplementedException();
         }
@@ -177,7 +199,7 @@ namespace WhiteBit.Net
             throw new NotImplementedException();
         }
 
-        public Task<WebCallResult<Ticker>> GetTickerAsync(string symbol, CancellationToken ct = default)
+        Task<WebCallResult<Ticker>> IBaseRestClient.GetTickerAsync(string symbol, CancellationToken ct)
         {
             throw new NotImplementedException();
         }

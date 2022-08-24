@@ -46,4 +46,9 @@ namespace WhiteBit.Net.Models.Enums
         Options
 
     }
+    public enum TraderRole
+    {
+        Maker = 1,
+        Taker = 2
+    }
 }

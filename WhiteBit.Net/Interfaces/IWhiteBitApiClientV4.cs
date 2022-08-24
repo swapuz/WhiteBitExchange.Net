@@ -77,10 +77,26 @@ namespace WhiteBit.Net.Interfaces
         /// place order
         /// </summary>
         /// <param name="parameters">create the instance with one of static methods of WhiteBitPlaceOrderRequest class
-        /// i.g. `WhiteBitPlaceOrderRequest.CreateLimitOrderRequest()`</param>
+        /// e.g. `WhiteBitPlaceOrderRequest.CreateLimitOrderRequest()`</param>
         /// <param name="ct"></param>
         /// <returns>order model</returns>
         Task<WebCallResult<WhiteBitOrder>> PlaceOrderAsync(WhiteBitPlaceOrderRequest parameters, CancellationToken ct = default);
+
+        /// <summary>
+        /// Cancel existing order
+        /// </summary>
+        /// <param name="symbol">Available market. Example: BTC_USDT</param>
+        /// <param name="orderId">Order Id. Example: 4180284841</param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<WebCallResult<WhiteBitOrder>> CancelOrderAsync(string symbol, long orderId, CancellationToken ct = default);
+        /// <summary>
+        /// This endpoint retrieves the deals history. Can be filtered by single market if needed.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<WebCallResult<List<WhiteBitOrder>>> GetActiveOrdersAsync(GetActiveOrdersRequest request, CancellationToken ct = default);
 
     }
 }
