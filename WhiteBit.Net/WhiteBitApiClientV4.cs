@@ -39,6 +39,8 @@ namespace WhiteBit.Net
         private const string PlaceStockMarketOrderUrl = "order/stock_market";
         private const string CancelOrderUrl = "order/cancel";
         private const string ActiveOrdersUrl = "orders";
+        private const string FilledOrdersUrl = "trade-account/order/history";
+        private const string OrderHistoryUrl = "trade-account/order";
 
 
         #endregion
@@ -59,28 +61,29 @@ namespace WhiteBit.Net
         {
             currency = currency.ToUpper();
             var result =  await SendRequestAsync<WhiteBitRawTradingBalance>(BalanceUrl, ct, new Dictionary<string, object>{{"ticker", currency}});
-            return result.As(new WhiteBitTradingBalance(result.Data){Currency = currency});
+            return result.As(result.Data.Convert(new WhiteBitTradingBalance {Currency = currency}));
         }
         
         ///<inheritdoc/>
         public async Task<WebCallResult<IEnumerable<WhiteBitTradingBalance>>> GetBalancesAsync(CancellationToken ct = default)
         {
             var result = await SendRequestAsync<Dictionary<string, WhiteBitRawTradingBalance>>(BalanceUrl, ct);
-            return result.As(result.Data.Select(b => new WhiteBitTradingBalance(b.Value) { Currency = b.Key }));
+            return result.As(result.Data.Select(b => b.Value.Convert(new WhiteBitTradingBalance { Currency = b.Key })));
         }
 
         ///<inheritdoc/>
         public async Task<WebCallResult<IEnumerable<WhiteBitTicker>>> GetTickersAsync(CancellationToken ct = default)
         {
             var result =  await SendRequestAsync<Dictionary<string,WhiteBitRawTicker>>(TickerUrl, ct);
-            return result.As(result.Data.Select(b => new WhiteBitTicker(b.Value) { Symbol = b.Key }));
+            return result.As(result.Data.Select(b => b.Value.Convert(new WhiteBitTicker { Symbol = b.Key })));
         }
 
         ///<inheritdoc/>
         public async Task<WebCallResult<IEnumerable<WhiteBitAsset>>> GetAssetsAsync(CancellationToken ct = default)
         {
             var result = await SendRequestAsync<Dictionary<string, WhiteBitRawAsset>>(AssetsUrl, ct);
-            return result.As(result.Data.Select(b => new WhiteBitAsset(b.Value) { Currency = b.Key }));
+            // return result.As(result.Data.Select(b => new WhiteBitAsset(b.Value) { Currency = b.Key }));
+            return result.As(result.Data.Select(b => b.Value.Convert(new WhiteBitAsset {Currency = b.Key} )));
         }
         ///<inheritdoc/>
         public async Task<WebCallResult<WhiteBitOrderBook>> GetOrderBookAsync(string symbol, int? depthLimit = null, int? aggregationLevel = null, CancellationToken ct = default)
@@ -140,6 +143,16 @@ namespace WhiteBit.Net
             }
             return result.As<List<WhiteBitOrder>>(new List<WhiteBitOrder>() {result.Data.ToObject<WhiteBitOrder>()! });
         }
+        // ///<inheritdoc/>
+        // public async Task<WebCallResult<List<WhiteBitOrder>>> GetFilledOrdersAsync(GetFilledOrdersRequest request, CancellationToken ct = default)
+        // {
+        //     WebCallResult<JToken> result = await SendRequestAsync<JToken>(ActiveOrdersUrl, ct, request.AsDictionary());
+        //     if (result.Data is JArray array)
+        //     {
+        //         return result.As(array.ToObject<List<WhiteBitOrder>>()!);
+        //     }
+        //     return result.As<List<WhiteBitOrder>>(new List<WhiteBitOrder>() {result.Data.ToObject<WhiteBitOrder>()! });
+        // }
 
         #endregion
 

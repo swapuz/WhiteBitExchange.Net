@@ -4,14 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using WhiteBit.Net.Helpers;
+using WhiteBit.Net.Interfaces;
 
 namespace WhiteBit.Net.Models.Responses
 {
     public class WhiteBitAsset : WhiteBitRawAsset
     {
-        public WhiteBitAsset(WhiteBitRawAsset parent) : base(parent)
-        {
-        }
 
         /// <summary>
         /// Currency
@@ -19,11 +17,8 @@ namespace WhiteBit.Net.Models.Responses
         public string? Currency { get; set; }
     }
 
-    public class WhiteBitRawAsset : ReflectableParent<WhiteBitRawAsset>
+    public class WhiteBitRawAsset : IConvertible<WhiteBitAsset>
     {
-        public WhiteBitRawAsset(WhiteBitRawAsset parent) : base(parent)
-        {
-        }
 
         [JsonProperty("name")]
         public string Name { get; set; } = string.Empty;

@@ -5,14 +5,12 @@ using System.Threading.Tasks;
 using CryptoExchange.Net.CommonObjects;
 using Newtonsoft.Json;
 using WhiteBit.Net.Helpers;
+using WhiteBit.Net.Interfaces;
 
 namespace WhiteBit.Net.Models.Responses
 {
     public class WhiteBitTicker : WhiteBitRawTicker
     {
-        internal WhiteBitTicker(WhiteBitRawTicker baseInstance) : base(baseInstance)
-        {
-        }
 
         public string? Symbol { get; set; }
 
@@ -27,11 +25,8 @@ namespace WhiteBit.Net.Models.Responses
             };
         }
     }
-    public class WhiteBitRawTicker : ReflectableParent<WhiteBitRawTicker>
+    public class WhiteBitRawTicker : IConvertible<WhiteBitTicker>
     {
-        public WhiteBitRawTicker(WhiteBitRawTicker parent) : base(parent)
-        {
-        }
 
         /// <summary>
         /// CoinmarketCap Id of base currency; 0 - if unknown

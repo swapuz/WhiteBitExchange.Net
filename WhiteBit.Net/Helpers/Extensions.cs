@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using WhiteBit.Net.Interfaces;
 
 namespace WhiteBit.Net.Helpers
 {
@@ -80,6 +81,21 @@ namespace WhiteBit.Net.Helpers
             {
                 throw ex;
             }
+        }
+        public static T Convert<T>(this IConvertible<T> source, T? target)
+        where T : class,new()
+        {
+            var result = target ?? new T();
+            var targPropNames = result.GetType().GetProperties().Select(prop => prop.Name).ToList();
+            foreach (PropertyInfo propertyInfo in source.GetType().GetProperties())
+            {
+                if (!targPropNames.Contains(propertyInfo.Name))
+                    continue;
+                object? value = propertyInfo?.GetValue(source);
+                if (null != value)
+                    propertyInfo!.SetValue(result, value);
+            }
+            return result;
         }
     }
 }
