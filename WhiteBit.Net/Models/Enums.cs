@@ -16,12 +16,12 @@ namespace WhiteBit.Net.Models.Enums
         /// Buy
         /// </summary>
         [EnumMember(Value = "buy")]
-        Buy,
+        Buy = 2,
         /// <summary>
         /// Sell
         /// </summary>
         [EnumMember(Value = "sell")]
-        Sell
+        Sell = 1
     }
     /// <summary>
     /// The type of the order

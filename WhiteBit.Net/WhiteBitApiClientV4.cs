@@ -40,7 +40,9 @@ namespace WhiteBit.Net
         private const string CancelOrderUrl = "order/cancel";
         private const string ActiveOrdersUrl = "orders";
         private const string FilledOrdersUrl = "trade-account/order/history";
-        private const string OrderHistoryUrl = "trade-account/order";
+        private const string OrderTradesUrl = "trade-account/order";
+        private const string OwnTradesUrl = "trade-account/executed-history";
+        
 
 
         #endregion
@@ -57,7 +59,7 @@ namespace WhiteBit.Net
 
         #region IWhiteBitApiClientV4 Methods
         ///<inheritdoc/>
-        public async Task<WebCallResult<WhiteBitTradingBalance>> GetBalanceAsync(string currency, CancellationToken ct = default)
+        public async Task<WebCallResult<WhiteBitTradingBalance?>> GetBalanceAsync(string currency, CancellationToken ct = default)
         {
             currency = currency.ToUpper();
             var result =  await SendRequestAsync<WhiteBitRawTradingBalance>(BalanceUrl, ct, new Dictionary<string, object>{{"ticker", currency}});
@@ -65,25 +67,24 @@ namespace WhiteBit.Net
         }
         
         ///<inheritdoc/>
-        public async Task<WebCallResult<IEnumerable<WhiteBitTradingBalance>>> GetBalancesAsync(CancellationToken ct = default)
+        public async Task<WebCallResult<IEnumerable<WhiteBitTradingBalance>?>> GetBalancesAsync(CancellationToken ct = default)
         {
             var result = await SendRequestAsync<Dictionary<string, WhiteBitRawTradingBalance>>(BalanceUrl, ct);
-            return result.As(result.Data.Select(b => b.Value.Convert(new WhiteBitTradingBalance { Currency = b.Key })));
+            return result.As(result.Data?.Select(b => b.Value.Convert(new WhiteBitTradingBalance { Currency = b.Key })!));
         }
 
         ///<inheritdoc/>
-        public async Task<WebCallResult<IEnumerable<WhiteBitTicker>>> GetTickersAsync(CancellationToken ct = default)
+        public async Task<WebCallResult<IEnumerable<WhiteBitTicker>?>> GetTickersAsync(CancellationToken ct = default)
         {
             var result =  await SendRequestAsync<Dictionary<string,WhiteBitRawTicker>>(TickerUrl, ct);
-            return result.As(result.Data.Select(b => b.Value.Convert(new WhiteBitTicker { Symbol = b.Key })));
+            return result.As(result.Data?.Select(b => b.Value.Convert(new WhiteBitTicker { Symbol = b.Key })!));
         }
 
         ///<inheritdoc/>
-        public async Task<WebCallResult<IEnumerable<WhiteBitAsset>>> GetAssetsAsync(CancellationToken ct = default)
+        public async Task<WebCallResult<IEnumerable<WhiteBitAsset>?>> GetAssetsAsync(CancellationToken ct = default)
         {
             var result = await SendRequestAsync<Dictionary<string, WhiteBitRawAsset>>(AssetsUrl, ct);
-            // return result.As(result.Data.Select(b => new WhiteBitAsset(b.Value) { Currency = b.Key }));
-            return result.As(result.Data.Select(b => b.Value.Convert(new WhiteBitAsset {Currency = b.Key} )));
+            return result.As(result.Data?.Select(b => b.Value.Convert(new WhiteBitAsset {Currency = b.Key} )!));
         }
         ///<inheritdoc/>
         public async Task<WebCallResult<WhiteBitOrderBook>> GetOrderBookAsync(string symbol, int? depthLimit = null, int? aggregationLevel = null, CancellationToken ct = default)
@@ -94,11 +95,12 @@ namespace WhiteBit.Net
             return await SendRequestAsync<WhiteBitOrderBook>(FillPathParameter(OrderBookUrl, symbol), ct, param);
         }
         ///<inheritdoc/>
-        public async Task<WebCallResult<List<WhiteBitPublicTrade>>> GetPublicTradesAsync(string symbol, WhiteBitOrderSide? side = null, CancellationToken ct = default)
+        public async Task<WebCallResult<IEnumerable<WhiteBitPublicTrade>?>> GetPublicTradesAsync(string symbol, WhiteBitOrderSide? side = null, CancellationToken ct = default)
         {
             var param = new Dictionary<string, object>();
             param.AddOptionalParameter("type", side?.ToString().ToLower());
-            return await SendRequestAsync<List<WhiteBitPublicTrade>>(FillPathParameter(PublicTradesUrl, symbol), ct, param);
+            var result = await SendRequestAsync<List<WhiteBitPublicTrade>>(FillPathParameter(PublicTradesUrl, symbol), ct, param);
+            return result.As(result.Data?.Select(tr => tr.Convert<WhiteBitPublicTrade>(new() { Symbol = symbol })!));
         }
         ///<inheritdoc/>
         public async Task<WebCallResult<List<WhiteBitFutures>?>> GetFuturesAsync(CancellationToken ct = default)
@@ -141,20 +143,30 @@ namespace WhiteBit.Net
             {
                 return result.As(array.ToObject<List<WhiteBitOrder>>()!);
             }
-            return result.As<List<WhiteBitOrder>>(new List<WhiteBitOrder>() {result.Data.ToObject<WhiteBitOrder>()! });
+            return result.As<List<WhiteBitOrder>>(new List<WhiteBitOrder>() {result.Data?.ToObject<WhiteBitOrder>()! });
         }
         ///<inheritdoc/>
         public async Task<WebCallResult<Dictionary<string, IEnumerable<WhiteBitOrder>>>> GetExecutedOrdersAsync(GetExecutedOrdersRequest? request = null, CancellationToken ct = default)
         {
-            WebCallResult<Dictionary<string, List<WhiteBitRawOrder>>> result = await SendRequestAsync<Dictionary<string, List<WhiteBitRawOrder>>>(FilledOrdersUrl, ct, request?.AsDictionary());
+            var result = await SendRequestAsync<Dictionary<string, List<WhiteBitRawOrder>>>(FilledOrdersUrl, ct, request?.AsDictionary());
             return result.As<Dictionary<string, IEnumerable<WhiteBitOrder>>>(
-                result.Data.ToDictionary(
+                result.Data?.ToDictionary(
                     entry => entry.Key,
-                    entry => entry.Value.Select(ord => ord.Convert<WhiteBitOrder>(new() { Symbol = entry.Key }))
+                    entry => entry.Value.Select(ord => ord.Convert<WhiteBitOrder>(new() { Symbol = entry.Key })!)
                 )
             );
         }
-
+        ///<inheritdoc/>
+        public async Task<WebCallResult<Dictionary<string, IEnumerable<WhiteBitUserTrade>>>> GetOwnTradesAsync(GetOwnTradesRequest? request = null, CancellationToken ct = default)
+        {
+            var result = await SendRequestAsync<Dictionary<string, IEnumerable<WhiteBitUserTrade>>>(OwnTradesUrl, ct, request?.AsDictionary());
+            return result.As<Dictionary<string, IEnumerable<WhiteBitUserTrade>>>(
+                result.Data?.ToDictionary(
+                    entry => entry.Key,
+                    entry => entry.Value.Select(tr => tr.Convert<WhiteBitUserTrade>(new() { Symbol = entry.Key })!)
+                )
+            );
+        }
         #endregion
 
         #region RestApiClient methods
@@ -260,12 +272,5 @@ namespace WhiteBit.Net
                 isPublic ? HttpMethodParameterPosition.InUri : HttpMethodParameterPosition.InBody
             );
         }
-
-        #region test
-        public async Task<DateTime> GetServerTimestampTest()
-        {
-            return (await GetServerTimestampAsync()).Data;
-        }
-        #endregion
     }
 }

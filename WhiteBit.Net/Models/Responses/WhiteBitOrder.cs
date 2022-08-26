@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CryptoExchange.Net.CommonObjects;
 using CryptoExchange.Net.Converters;
 using Newtonsoft.Json;
 using WhiteBit.Net.Interfaces;

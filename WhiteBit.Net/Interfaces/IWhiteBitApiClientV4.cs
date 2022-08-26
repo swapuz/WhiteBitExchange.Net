@@ -19,28 +19,28 @@ namespace WhiteBit.Net.Interfaces
         /// <param name="currency">Currency's ticker. Example: BTC</param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<WebCallResult<WhiteBitTradingBalance>> GetBalanceAsync(string currency, CancellationToken ct = default);
+        Task<WebCallResult<WhiteBitTradingBalance?>> GetBalanceAsync(string currency, CancellationToken ct = default);
 
         /// <summary>
         /// retrieves all balances.
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<WebCallResult<IEnumerable<WhiteBitTradingBalance>>> GetBalancesAsync(CancellationToken ct = default);
+        Task<WebCallResult<IEnumerable<WhiteBitTradingBalance>?>> GetBalancesAsync(CancellationToken ct = default);
 
         /// <summary>
         /// This method retrieves a 24-hour pricing and volume summary for each market pair available on the exchange.
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
-        new Task<WebCallResult<IEnumerable<WhiteBitTicker>>> GetTickersAsync(CancellationToken ct = default);
+        new Task<WebCallResult<IEnumerable<WhiteBitTicker>?>> GetTickersAsync(CancellationToken ct = default);
 
         /// <summary>
         /// This method retrieves the assets status.
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<WebCallResult<IEnumerable<WhiteBitAsset>>> GetAssetsAsync(CancellationToken ct = default);
+        Task<WebCallResult<IEnumerable<WhiteBitAsset>?>> GetAssetsAsync(CancellationToken ct = default);
         /// <summary>
         /// This method retrieves the current order book as two arrays (bids / asks) with additional parameters.
         /// </summary>
@@ -60,7 +60,7 @@ namespace WhiteBit.Net.Interfaces
         /// <param name="side">Can be buy or sell</param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<WebCallResult<List<WhiteBitPublicTrade>>> GetPublicTradesAsync(string symbol, WhiteBitOrderSide? side = null, CancellationToken ct = default);
+        Task<WebCallResult<IEnumerable<WhiteBitPublicTrade>?>> GetPublicTradesAsync(string symbol, WhiteBitOrderSide? side = null, CancellationToken ct = default);
         /// <summary>
         /// This method returns the list of available futures markets.
         /// </summary>
@@ -104,6 +104,7 @@ namespace WhiteBit.Net.Interfaces
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<WebCallResult<Dictionary<string, IEnumerable<WhiteBitOrder>>>> GetExecutedOrdersAsync(GetExecutedOrdersRequest? request = null, CancellationToken ct = default);
+        Task<WebCallResult<Dictionary<string, IEnumerable<WhiteBitUserTrade>>>> GetOwnTradesAsync(GetOwnTradesRequest? request = null, CancellationToken ct = default);
 
     }
 }

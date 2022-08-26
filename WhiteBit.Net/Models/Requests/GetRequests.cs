@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 
 namespace WhiteBit.Net.Models.Requests
 {
-    public class GetOrdersRequest : PaginationRequest
+    public class BaseGetRequest : PaginationRequest
     {
         /// <summary>
         /// 
@@ -16,7 +16,7 @@ namespace WhiteBit.Net.Models.Requests
         /// <param name="clientOrderId"><see cref="ClientOrderId"/></param>
         /// <param name="limit"><see cref="PaginationRequest.Limit"/></param>
         /// <param name="offset"><see cref="PaginationRequest.Offset"/></param>
-        protected GetOrdersRequest(string? market = null, long? orderId = null, string? clientOrderId = null, int? limit = null, int? offset = null) : base(limit, offset)
+        protected BaseGetRequest(string? market = null, long? orderId = null, string? clientOrderId = null, int? limit = null, int? offset = null) : base(limit, offset)
         {
             Market = market;
             OrderId = orderId;
@@ -32,10 +32,9 @@ namespace WhiteBit.Net.Models.Requests
         [JsonProperty("clientOrderId")]
         public string? ClientOrderId { get; private set; }
 
-        public static GetOrdersRequest GetExecutedOrdersRequest(string? market = null, long? orderId = null, string? clientOrderId = null, int? limit = null, int? offset = null) => new GetOrdersRequest(market, orderId, clientOrderId, limit, offset);
     }
 
-    public class GetActiveOrdersRequest : GetOrdersRequest
+    public class GetActiveOrdersRequest : BaseGetRequest
     {
         /// <summary>
         /// 
@@ -48,7 +47,7 @@ namespace WhiteBit.Net.Models.Requests
         public GetActiveOrdersRequest(string symbol, long? orderId = null, string? clientOrderId = null, int? limit = null, int? offset = null) : base(symbol, orderId, clientOrderId, limit, offset)
         {}
     }
-    public class GetExecutedOrdersRequest : GetOrdersRequest
+    public class GetExecutedOrdersRequest : BaseGetRequest
     {
         /// <summary>
         /// 
@@ -61,4 +60,29 @@ namespace WhiteBit.Net.Models.Requests
         public GetExecutedOrdersRequest(string? symbol = null, long? orderId = null, string? clientOrderId = null, int? limit = null, int? offset = null) : base(symbol, orderId, clientOrderId, limit, offset)
         {}
     }
+    public class GetOrderTradesRequest : BaseGetRequest
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="orderId">Available orderId. Example: 3134995325</param>
+        /// <param name="limit">LIMIT is a special clause used to limit records a particular query can return. Default: 50, Min: 1, Max: 100</param>
+        /// <param name="offset">If you want the request to return entries starting from a particular line, you can use OFFSET clause to tell it where it should start. Default: 0, Min: 0, Max: 10000</param>
+        public GetOrderTradesRequest(long orderId, int? limit = null, int? offset = null) : base(orderId:orderId, limit:limit, offset:offset)
+        {}
+    }
+    public class GetOwnTradesRequest : BaseGetRequest
+    {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="symbol">Available market. Example: BTC_USDT</param>
+        /// <param name="clientOrderId">Available clientOrderId. Example: customId11</param>
+        /// <param name="limit">LIMIT is a special clause used to limit records a particular query can return. Default: 50, Min: 1, Max: 100</param>
+        /// <param name="offset">If you want the request to return entries starting from a particular line, you can use OFFSET clause to tell it where it should start. Default: 0, Min: 0, Max: 10000</param>
+        public GetOwnTradesRequest(string? symbol = null, string? clientOrderId = null, int? limit = null, int? offset = null) : base(symbol, null, clientOrderId, limit, offset)
+        { }
+    }
+
+    
 }

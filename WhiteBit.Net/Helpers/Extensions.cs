@@ -89,9 +89,11 @@ namespace WhiteBit.Net.Helpers
         /// <param name="source"></param>
         /// <param name="target">you can initialize object with predefined values of nullable (or not exist in source obj) properties.</param>
         /// <returns></returns>
-        public static T Convert<T>(this IConvertible<T> source, T? target = null)
+        public static T? Convert<T>(this IConvertible<T> source, T? target = null)
         where T : class,new()
         {
+            if (source is null)
+                return null;
             var result = target ?? new T();
             var targPropNames = result.GetType().GetProperties().Where(prop => prop.CanWrite).Select(prop => prop.Name).ToList();
             foreach (PropertyInfo propertyInfo in source.GetType().GetProperties().Where(prop => prop.CanRead))

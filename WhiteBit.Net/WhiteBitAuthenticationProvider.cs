@@ -45,7 +45,6 @@ namespace WhiteBit.Net
 
             headers.Add("X-TXC-APIKEY", Credentials.Key!.GetString());
             var payload = JsonConvert.SerializeObject(bodyParameters);
-            Console.WriteLine(payload);
             var encodedPayload = Base64Encode(payload);
             headers.Add("X-TXC-PAYLOAD", encodedPayload);
             // lower case is necessary here but not documented
