@@ -91,12 +91,19 @@ namespace WhiteBit.Net.Interfaces
         /// <returns></returns>
         Task<WebCallResult<WhiteBitOrder>> CancelOrderAsync(string symbol, long orderId, CancellationToken ct = default);
         /// <summary>
-        /// This endpoint retrieves the deals history. Can be filtered by single market if needed.
+        /// This method retrieves unexecuted orders only.
         /// </summary>
         /// <param name="request"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<WebCallResult<List<WhiteBitOrder>>> GetActiveOrdersAsync(GetActiveOrdersRequest request, CancellationToken ct = default);
+        /// <summary>
+        /// This methodretrieves executed order histExecutby market.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<WebCallResult<Dictionary<string, IEnumerable<WhiteBitOrder>>>> GetExecutedOrdersAsync(GetExecutedOrdersRequest? request = null, CancellationToken ct = default);
 
     }
 }

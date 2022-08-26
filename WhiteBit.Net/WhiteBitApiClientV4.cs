@@ -143,16 +143,17 @@ namespace WhiteBit.Net
             }
             return result.As<List<WhiteBitOrder>>(new List<WhiteBitOrder>() {result.Data.ToObject<WhiteBitOrder>()! });
         }
-        // ///<inheritdoc/>
-        // public async Task<WebCallResult<List<WhiteBitOrder>>> GetFilledOrdersAsync(GetFilledOrdersRequest request, CancellationToken ct = default)
-        // {
-        //     WebCallResult<JToken> result = await SendRequestAsync<JToken>(ActiveOrdersUrl, ct, request.AsDictionary());
-        //     if (result.Data is JArray array)
-        //     {
-        //         return result.As(array.ToObject<List<WhiteBitOrder>>()!);
-        //     }
-        //     return result.As<List<WhiteBitOrder>>(new List<WhiteBitOrder>() {result.Data.ToObject<WhiteBitOrder>()! });
-        // }
+        ///<inheritdoc/>
+        public async Task<WebCallResult<Dictionary<string, IEnumerable<WhiteBitOrder>>>> GetExecutedOrdersAsync(GetExecutedOrdersRequest? request = null, CancellationToken ct = default)
+        {
+            WebCallResult<Dictionary<string, List<WhiteBitRawOrder>>> result = await SendRequestAsync<Dictionary<string, List<WhiteBitRawOrder>>>(FilledOrdersUrl, ct, request?.AsDictionary());
+            return result.As<Dictionary<string, IEnumerable<WhiteBitOrder>>>(
+                result.Data.ToDictionary(
+                    entry => entry.Key,
+                    entry => entry.Value.Select(ord => ord.Convert<WhiteBitOrder>(new() { Symbol = entry.Key }))
+                )
+            );
+        }
 
         #endregion
 

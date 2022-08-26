@@ -30,7 +30,7 @@ namespace WhiteBit.Net.Models.Requests
         /// </summary>
         public int? Limit {
             get => _limit;
-            set
+            protected set
             {
 
                 _limit = value switch
@@ -49,7 +49,7 @@ namespace WhiteBit.Net.Models.Requests
         /// </summary>
         public int? Offset {
             get => _offset;
-            set
+            protected set
             {
                 _offset = value switch
                 {

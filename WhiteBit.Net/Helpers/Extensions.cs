@@ -82,17 +82,24 @@ namespace WhiteBit.Net.Helpers
                 throw ex;
             }
         }
-        public static T Convert<T>(this IConvertible<T> source, T? target)
+        /// <summary>
+        /// Create instance of T based on source properties.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source"></param>
+        /// <param name="target">you can initialize object with predefined values of nullable (or not exist in source obj) properties.</param>
+        /// <returns></returns>
+        public static T Convert<T>(this IConvertible<T> source, T? target = null)
         where T : class,new()
         {
             var result = target ?? new T();
-            var targPropNames = result.GetType().GetProperties().Select(prop => prop.Name).ToList();
-            foreach (PropertyInfo propertyInfo in source.GetType().GetProperties())
+            var targPropNames = result.GetType().GetProperties().Where(prop => prop.CanWrite).Select(prop => prop.Name).ToList();
+            foreach (PropertyInfo propertyInfo in source.GetType().GetProperties().Where(prop => prop.CanRead))
             {
                 if (!targPropNames.Contains(propertyInfo.Name))
                     continue;
-                object? value = propertyInfo?.GetValue(source);
-                if (null != value)
+                var value = propertyInfo?.GetValue(source);
+                if (null != value )
                     propertyInfo!.SetValue(result, value);
             }
             return result;
