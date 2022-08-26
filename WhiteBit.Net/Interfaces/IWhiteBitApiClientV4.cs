@@ -111,7 +111,7 @@ namespace WhiteBit.Net.Interfaces
         /// <param name="request"></param>
         /// <param name="ct"></param>
         /// <returns></returns>This endpoint retrieves deals history details on pending or executed order.
-        Task<WebCallResult<OrderTradesResponse>> GetOrderTradesAsync(GetOrderTradesRequest request, CancellationToken ct = default);
+        Task<WebCallResult<IEnumerable<WhiteBitUserTrade>?>> GetOrderTradesAsync(GetOrderTradesRequest request, CancellationToken ct = default);
 
     }
 }

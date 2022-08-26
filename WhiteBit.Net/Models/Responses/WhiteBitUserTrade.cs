@@ -68,8 +68,4 @@ namespace WhiteBit.Net.Models.Responses
         private string? FeeAsset => Symbol?.Split('_').LastOrDefault();
         #endregion
     }
-    public class OrderTradesResponse : WhiteBitPaginatedResponse<IEnumerable<WhiteBitUserTrade>>
-    {
-
-    }
 }

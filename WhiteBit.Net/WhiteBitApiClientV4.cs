@@ -168,9 +168,10 @@ namespace WhiteBit.Net
             );
         }
         ///<inheritdoc/>
-        public async Task<WebCallResult<OrderTradesResponse>> GetOrderTradesAsync(GetOrderTradesRequest request, CancellationToken ct = default)
+        public async Task<WebCallResult<IEnumerable<WhiteBitUserTrade>?>> GetOrderTradesAsync(GetOrderTradesRequest request, CancellationToken ct = default)
         {
-            return await SendRequestAsync<OrderTradesResponse>(OrderTradesUrl, ct, request.AsDictionary());
+            var result = await SendRequestAsync<WhiteBitPaginatedResponse<IEnumerable<WhiteBitUserTrade>>>(OrderTradesUrl, ct, request.AsDictionary());
+            return result.As(result.Data?.Result);
         }
         #endregion
 
