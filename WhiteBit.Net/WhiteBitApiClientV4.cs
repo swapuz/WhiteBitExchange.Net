@@ -167,6 +167,11 @@ namespace WhiteBit.Net
                 )
             );
         }
+        ///<inheritdoc/>
+        public async Task<WebCallResult<OrderTradesResponse>> GetOrderTradesAsync(GetOrderTradesRequest request, CancellationToken ct = default)
+        {
+            return await SendRequestAsync<OrderTradesResponse>(OrderTradesUrl, ct, request.AsDictionary());
+        }
         #endregion
 
         #region RestApiClient methods

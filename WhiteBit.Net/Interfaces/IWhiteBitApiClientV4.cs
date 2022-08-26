@@ -98,13 +98,20 @@ namespace WhiteBit.Net.Interfaces
         /// <returns></returns>
         Task<WebCallResult<List<WhiteBitOrder>>> GetActiveOrdersAsync(GetActiveOrdersRequest request, CancellationToken ct = default);
         /// <summary>
-        /// This methodretrieves executed order histExecutby market.
+        /// This method retrieves executed order histExecutby market.
         /// </summary>
         /// <param name="request"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<WebCallResult<Dictionary<string, IEnumerable<WhiteBitOrder>>>> GetExecutedOrdersAsync(GetExecutedOrdersRequest? request = null, CancellationToken ct = default);
         Task<WebCallResult<Dictionary<string, IEnumerable<WhiteBitUserTrade>>>> GetOwnTradesAsync(GetOwnTradesRequest? request = null, CancellationToken ct = default);
+        /// <summary>
+        /// This method retrieves deals history details on pending or executed order.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>This endpoint retrieves deals history details on pending or executed order.
+        Task<WebCallResult<OrderTradesResponse>> GetOrderTradesAsync(GetOrderTradesRequest request, CancellationToken ct = default);
 
     }
 }
