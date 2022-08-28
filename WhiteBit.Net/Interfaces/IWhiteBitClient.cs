@@ -10,7 +10,7 @@ namespace WhiteBit.Net.Interfaces
 {
     public interface IWhiteBitClient: IRestClient
     {
-        IWhiteBitApiClientV4 ApiClientV4 { get; }
+        IWhiteBitApiClientV4 ApiClient { get; }
         ISpotClient CommonSpotClient { get; }
     }
 }
