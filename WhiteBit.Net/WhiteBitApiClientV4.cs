@@ -117,7 +117,7 @@ namespace WhiteBit.Net
         public async Task<WebCallResult<WhiteBitOrder>> PlaceOrderAsync(WhiteBitPlaceOrderRequest parameters ,CancellationToken ct = default)
         {
             var requestParam = parameters.AsDictionary();
-            return parameters.Type switch
+            var result =  parameters.Type switch
             {
                 WhiteBitOrderType.Limit => await SendRequestAsync<WhiteBitOrder>(PlaceLimitOrderUrl, ct, requestParam),
                 WhiteBitOrderType.Market => await SendRequestAsync<WhiteBitOrder>(PlaceMarketOrderUrl, ct, requestParam),
@@ -126,6 +126,11 @@ namespace WhiteBit.Net
                 WhiteBitOrderType.StopLimit => await SendRequestAsync<WhiteBitOrder>(PlaceStopLimitOrderUrl, ct, requestParam),
                 _ => throw new ArgumentException("Unsupported order type")
             };
+            if (result)
+            {
+                OnOrderPlaced?.Invoke(new OrderId() { Id = result.Data.OrderId.ToString(), SourceObject = result.Data });
+            }
+            return result;
         }
         ///<inheritdoc/>
         public async Task<WebCallResult<WhiteBitOrder>> CancelOrderAsync(string symbol, long orderId, CancellationToken ct = default)
@@ -133,7 +138,12 @@ namespace WhiteBit.Net
             var requestParam = new Dictionary<string, object>();
             requestParam.Add("market", symbol);
             requestParam.Add("orderId", orderId);
-            return await SendRequestAsync<WhiteBitOrder>(CancelOrderUrl, ct, requestParam);
+            var result  = await SendRequestAsync<WhiteBitOrder>(CancelOrderUrl, ct, requestParam);
+            if (result)
+            {
+                OnOrderCanceled?.Invoke(new OrderId() { Id = result.Data.OrderId.ToString(), SourceObject = result.Data });
+            }
+            return result;
         }
         ///<inheritdoc/>
         public async Task<WebCallResult<List<WhiteBitOrder>>> GetActiveOrdersAsync(GetActiveOrdersRequest request, CancellationToken ct = default)
