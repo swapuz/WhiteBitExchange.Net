@@ -1,17 +1,22 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
+using CryptoExchange.Net.CommonObjects;
 using Newtonsoft.Json;
 using WhiteBit.Net.Interfaces;
+using WhiteBit.Net.Models.Enums;
 
 namespace WhiteBit.Net.Helpers
 {
     public static class Extensions
     {
+        const BindingFlags boundingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
+
         private static string? Normalize(this decimal? value)
         {
             if (!value.HasValue)
@@ -82,6 +87,7 @@ namespace WhiteBit.Net.Helpers
                 throw ex;
             }
         }
+
         /// <summary>
         /// Create instance of T based on source properties.
         /// </summary>
@@ -89,22 +95,39 @@ namespace WhiteBit.Net.Helpers
         /// <param name="source"></param>
         /// <param name="target">you can initialize object with predefined values of nullable (or not exist in source obj) properties.</param>
         /// <returns></returns>
-        public static T? Convert<T>(this IConvertible<T> source, T? target = null)
+        internal static T? Convert<T>(this IConvertible<T> source, T? target = null)
         where T : class,new()
         {
             if (source is null)
                 return null;
             var result = target ?? new T();
-            var targPropNames = result.GetType().GetProperties().Where(prop => prop.CanWrite).Select(prop => prop.Name).ToList();
-            foreach (PropertyInfo propertyInfo in source.GetType().GetProperties().Where(prop => prop.CanRead))
+            var sourcePropNames = source.GetType().GetProperties(boundingFlags).Where(prop => prop.CanRead).ToDictionary(p => p.Name, p => p);
+            foreach (PropertyInfo propertyInfo in result.GetType().GetProperties(boundingFlags).Where(prop => prop.CanWrite))
             {
-                if (!targPropNames.Contains(propertyInfo.Name))
-                    continue;
-                var value = propertyInfo?.GetValue(source);
-                if (null != value )
-                    propertyInfo!.SetValue(result, value);
+                if (sourcePropNames.TryGetValue(propertyInfo.Name, out var sProp))
+                {
+                    var value = sProp.GetValue(source);
+                    if (value != null)
+                    {
+                        var sType = Nullable.GetUnderlyingType(sProp.PropertyType) ?? sProp.PropertyType;
+                        var tType = Nullable.GetUnderlyingType(propertyInfo.PropertyType) ?? propertyInfo.PropertyType;
+
+                        if (sType == tType)
+                            propertyInfo!.SetValue(result, value);
+                        else
+                            propertyInfo!.SetValue(result, System.Convert.ChangeType(value, tType));
+                    }
+                }
             }
             return result;
+        }
+        public static WhiteBitOrderSide ToWhiteBitOrderSide(this CommonOrderSide source)
+        {
+            return source switch
+            {
+                CommonOrderSide.Sell => WhiteBitOrderSide.Sell,
+                _ => WhiteBitOrderSide.Buy
+            };
         }
     }
 }

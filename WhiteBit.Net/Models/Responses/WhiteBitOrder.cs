@@ -17,6 +17,37 @@ namespace WhiteBit.Net.Models.Responses
         /// </summary>
         [JsonProperty("market")]
         public string Symbol { get; set; } = string.Empty;
+
+        internal Order ToCommonOrder()
+        {
+            return new Order()
+            {
+                Id = OrderId.ToString(),
+                Symbol = Symbol,
+                Quantity = Amount,
+                QuantityFilled = DealStock,
+                Timestamp = CreatingTimestamp,
+                Price = Price,
+                Side = Side switch
+                {
+                    WhiteBitOrderSide.Buy => CommonOrderSide.Buy,
+                    _ => CommonOrderSide.Sell
+                },
+                Type = Type switch
+                {
+                    WhiteBitOrderType.Market => CommonOrderType.Market,
+                    WhiteBitOrderType.StockMarket => CommonOrderType.Market,
+                    WhiteBitOrderType.Limit => CommonOrderType.Limit,
+                    _ => CommonOrderType.Other
+                },
+                Status = Left switch
+                {
+                    > 0 => CommonOrderStatus.Active,
+                    _ => CommonOrderStatus.Filled
+                },
+                SourceObject = this
+            };
+        }
     }
     public class WhiteBitRawOrder : IConvertible<WhiteBitOrder>
     {
@@ -60,7 +91,7 @@ namespace WhiteBit.Net.Models.Responses
         public WhiteBitOrderType Type { get; set; }
 
         /// <summary>
-        /// amount in stock currency that finished
+        /// amount in quoted currency that finished
         /// </summary>
         [JsonProperty("dealMoney")]
         public decimal DealMoney { get => dealMoney; set => dealMoney = value; }
@@ -68,7 +99,7 @@ namespace WhiteBit.Net.Models.Responses
         internal decimal DealMoneyUnderscore { set => dealMoney = value; }
 
         /// <summary>
-        /// amount in stock currency that finished
+        /// amount in base currency that finished
         /// </summary>
         [JsonProperty("dealStock")]
         public decimal DealStock { get => dealStock; set => dealStock = value; }

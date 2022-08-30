@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using CryptoExchange.Net;
 using CryptoExchange.Net.Authentication;
@@ -158,11 +159,19 @@ namespace WhiteBit.Net
         ///<inheritdoc/>
         public async Task<WebCallResult<Dictionary<string, IEnumerable<WhiteBitOrder>>>> GetExecutedOrdersAsync(GetExecutedOrdersRequest? request = null, CancellationToken ct = default)
         {
-            var result = await SendRequestAsync<Dictionary<string, List<WhiteBitRawOrder>>>(FilledOrdersUrl, ct, request?.AsDictionary());
+            var result = await SendRequestAsync<JToken>(FilledOrdersUrl, ct, request?.AsDictionary());
+            if (result.Data is JArray array)
+            {
+                if (array.Count == 0)
+                {
+                    return result.As(new Dictionary<string, IEnumerable<WhiteBitOrder>>());
+                }
+                return result.As(new Dictionary<string, IEnumerable<WhiteBitOrder>>() { { request?.Market ?? string.Empty, array.ToObject<IEnumerable<WhiteBitOrder>>()!} });
+            }
             return result.As<Dictionary<string, IEnumerable<WhiteBitOrder>>>(
-                result.Data?.ToDictionary(
+                result.Data?.ToObject<Dictionary<string, IEnumerable<WhiteBitRawOrder>>>()?.ToDictionary(
                     entry => entry.Key,
-                    entry => entry.Value.Select(ord => ord.Convert<WhiteBitOrder>(new() { Symbol = entry.Key })!)
+                    entry => entry.Value.Select(ord => ord.Convert(new() { Symbol = entry.Key })!)
                 )
             );
         }
@@ -186,49 +195,69 @@ namespace WhiteBit.Net
         #endregion
 
         #region RestApiClient methods
-        Task<WebCallResult<OrderId>> IBaseRestClient.CancelOrderAsync(string orderId, string? symbol, CancellationToken ct)
+        public async Task<WebCallResult<OrderId?>> CancelOrderAsync(string orderId, string symbol, CancellationToken ct = default)
+        {
+            if (symbol == null) throw new ArgumentNullException(nameof(symbol));
+
+            var result = await CancelOrderAsync(symbol, Int64.Parse(orderId), ct);
+            return result.As(!result ? null : new OrderId() { Id = result.Data.OrderId.ToString(), SourceObject = result.Data });
+        }
+
+        Task<WebCallResult<IEnumerable<Balance>>> IBaseRestClient.GetBalancesAsync(string? accountId, CancellationToken ct)
         {
             throw new NotImplementedException();
         }
 
-        public Task<WebCallResult<IEnumerable<Balance>>> GetBalancesAsync(string? accountId = null, CancellationToken ct = default)
+        async Task<WebCallResult<IEnumerable<Order>?>> IBaseRestClient.GetClosedOrdersAsync(string? symbol, CancellationToken ct)
+        {
+            var result = await GetExecutedOrdersAsync(symbol is null ? null : new GetExecutedOrdersRequest(symbol), ct);
+            return result.As(result.Data?.SelectMany(x => x.Value).Select(ord => ord.ToCommonOrder()));
+        }
+
+        Task<WebCallResult<IEnumerable<Kline>>> IBaseRestClient.GetKlinesAsync(string symbol, TimeSpan timespan, DateTime? startTime, DateTime? endTime, int? limit, CancellationToken ct)
         {
             throw new NotImplementedException();
         }
 
-        public Task<WebCallResult<IEnumerable<Order>>> GetClosedOrdersAsync(string? symbol = null, CancellationToken ct = default)
+        public async Task<WebCallResult<IEnumerable<Order>?>> GetOpenOrdersAsync(string symbol, CancellationToken ct = default)
+        {
+            if (symbol == null) throw new ArgumentNullException(nameof(symbol));
+
+            var result = await GetActiveOrdersAsync(new GetActiveOrdersRequest(symbol), ct);
+            return result.As(result.Data?.Select(ord => ord.ToCommonOrder()));
+        }
+
+        public async Task<WebCallResult<Order?>> GetOrderAsync(string orderId, string symbol, CancellationToken ct = default)
+        {
+            if (symbol == null) throw new ArgumentNullException(nameof(symbol));
+
+            var resultA = await GetActiveOrdersAsync(new GetActiveOrdersRequest(symbol, Int64.Parse(orderId)), ct);
+
+            if (resultA.Data?.Any() == true)
+            {
+                var orderA = resultA.Data.Last();
+                return resultA.As(orderA?.ToCommonOrder());
+            }
+            var resultX = await GetExecutedOrdersAsync(new GetExecutedOrdersRequest(symbol, Int64.Parse(orderId)), ct);
+            var orderX = resultX.Data?.Any() == true ? resultX.Data?[symbol].LastOrDefault() : null;
+            return resultX.As(orderX?.ToCommonOrder());
+        }
+
+        public Task<WebCallResult<OrderBook>> GetOrderBookAsync(string symbol, CancellationToken ct)
         {
             throw new NotImplementedException();
         }
 
-        public Task<WebCallResult<IEnumerable<Kline>>> GetKlinesAsync(string symbol, TimeSpan timespan, DateTime? startTime = null, DateTime? endTime = null, int? limit = null, CancellationToken ct = default)
+        async Task<WebCallResult<IEnumerable<UserTrade>?>> IBaseRestClient.GetOrderTradesAsync(string orderId, string? symbol, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            var result = await GetOrderTradesAsync(new GetOrderTradesRequest(Int64.Parse(orderId)), ct);
+            return result.As(result.Data?.Select(trade => trade.Convert(new UserTrade() { SourceObject = trade })!));
         }
 
-        public Task<WebCallResult<IEnumerable<Order>>> GetOpenOrdersAsync(string? symbol = null, CancellationToken ct = default)
+        async Task<WebCallResult<IEnumerable<Trade>?>> IBaseRestClient.GetRecentTradesAsync(string symbol, CancellationToken ct)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<WebCallResult<Order>> GetOrderAsync(string orderId, string? symbol = null, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<WebCallResult<OrderBook>> GetOrderBookAsync(string symbol, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<WebCallResult<IEnumerable<UserTrade>>> GetOrderTradesAsync(string orderId, string? symbol = null, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<WebCallResult<IEnumerable<Trade>>> GetRecentTradesAsync(string symbol, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
+            var result = await GetPublicTradesAsync(symbol, null , ct);
+            return result.As(result.Data?.Select(trade => trade.Convert(new Trade() { SourceObject = trade })!));
         }
 
         public string GetSymbolName(string baseAsset, string quoteAsset)
@@ -236,7 +265,7 @@ namespace WhiteBit.Net
             return $"{baseAsset}_{quoteAsset}".ToUpper(CultureInfo.InvariantCulture);
         }
 
-        public Task<WebCallResult<IEnumerable<Symbol>>> GetSymbolsAsync(CancellationToken ct = default)
+        Task<WebCallResult<IEnumerable<Symbol>>> IBaseRestClient.GetSymbolsAsync(CancellationToken ct)
         {
             throw new NotImplementedException();
         }
@@ -250,10 +279,28 @@ namespace WhiteBit.Net
         {
             throw new NotImplementedException();
         }
-
-        public Task<WebCallResult<OrderId>> PlaceOrderAsync(string symbol, CommonOrderSide side, CommonOrderType type, decimal quantity, decimal? price = null, string? accountId = null, string? clientOrderId = null, CancellationToken ct = default)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="side"></param>
+        /// <param name="type">supported Limit or Market only</param>
+        /// <param name="quantity"></param>
+        /// <param name="price">required for Limit order</param>
+        /// <param name="accountId"></param>
+        /// <param name="clientOrderId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        async public Task<WebCallResult<OrderId?>> PlaceOrderAsync(string symbol, CommonOrderSide side, CommonOrderType type, decimal quantity, decimal? price = null, string? accountId = null, string? clientOrderId = null, CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            WhiteBitPlaceOrderRequest request = type switch
+            {
+                CommonOrderType.Market => WhiteBitPlaceOrderRequest.CreateStockMarketOrderRequest(symbol, side.ToWhiteBitOrderSide(), quantity, clientOrderId),
+                CommonOrderType.Limit => WhiteBitPlaceOrderRequest.CreateLimitOrderRequest(symbol, side.ToWhiteBitOrderSide(), quantity, price.Value, clientOrderId),
+                _ => throw new ArgumentException("Unsopported order type, use either Market or Limit")
+            };
+            var result = await PlaceOrderAsync(request, ct);
+            return result.As(!result ? null : new OrderId() { Id = result.Data.OrderId.ToString(), SourceObject = result.Data });
         }
         #endregion
 
