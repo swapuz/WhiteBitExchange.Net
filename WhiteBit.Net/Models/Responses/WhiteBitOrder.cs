@@ -18,7 +18,7 @@ namespace WhiteBit.Net.Models.Responses
         [JsonProperty("market")]
         public string Symbol { get; set; } = string.Empty;
 
-        internal Order ToCommonOrder()
+        internal Order ToCryptoExchangeOrder()
         {
             return new Order()
             {

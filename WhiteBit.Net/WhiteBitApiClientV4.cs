@@ -203,17 +203,22 @@ namespace WhiteBit.Net
             return result.As(!result ? null : new OrderId() { Id = result.Data.OrderId.ToString(), SourceObject = result.Data });
         }
 
-        Task<WebCallResult<IEnumerable<Balance>>> IBaseRestClient.GetBalancesAsync(string? accountId, CancellationToken ct)
+        async Task<WebCallResult<IEnumerable<Balance>?>> IBaseRestClient.GetBalancesAsync(string? accountId, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            var result = await GetBalancesAsync(ct);
+            return result.As(result.Data?.Select(b => b.Convert(new Balance() {SourceObject = b })!));
         }
 
         async Task<WebCallResult<IEnumerable<Order>?>> IBaseRestClient.GetClosedOrdersAsync(string? symbol, CancellationToken ct)
         {
             var result = await GetExecutedOrdersAsync(symbol is null ? null : new GetExecutedOrdersRequest(symbol), ct);
-            return result.As(result.Data?.SelectMany(x => x.Value).Select(ord => ord.ToCommonOrder()));
+            return result.As(result.Data?.SelectMany(x => x.Value).Select(ord => ord.ToCryptoExchangeOrder()));
         }
-
+        /// <summary>
+        /// Unimplemented yet
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         Task<WebCallResult<IEnumerable<Kline>>> IBaseRestClient.GetKlinesAsync(string symbol, TimeSpan timespan, DateTime? startTime, DateTime? endTime, int? limit, CancellationToken ct)
         {
             throw new NotImplementedException();
@@ -224,7 +229,7 @@ namespace WhiteBit.Net
             if (symbol == null) throw new ArgumentNullException(nameof(symbol));
 
             var result = await GetActiveOrdersAsync(new GetActiveOrdersRequest(symbol), ct);
-            return result.As(result.Data?.Select(ord => ord.ToCommonOrder()));
+            return result.As(result.Data?.Select(ord => ord.ToCryptoExchangeOrder()));
         }
 
         public async Task<WebCallResult<Order?>> GetOrderAsync(string orderId, string symbol, CancellationToken ct = default)
@@ -236,16 +241,17 @@ namespace WhiteBit.Net
             if (resultA.Data?.Any() == true)
             {
                 var orderA = resultA.Data.Last();
-                return resultA.As(orderA?.ToCommonOrder());
+                return resultA.As(orderA?.ToCryptoExchangeOrder());
             }
             var resultX = await GetExecutedOrdersAsync(new GetExecutedOrdersRequest(symbol, Int64.Parse(orderId)), ct);
             var orderX = resultX.Data?.Any() == true ? resultX.Data?[symbol].LastOrDefault() : null;
-            return resultX.As(orderX?.ToCommonOrder());
+            return resultX.As(orderX?.ToCryptoExchangeOrder());
         }
 
-        public Task<WebCallResult<OrderBook>> GetOrderBookAsync(string symbol, CancellationToken ct)
+        async Task<WebCallResult<OrderBook?>> IBaseRestClient.GetOrderBookAsync(string symbol, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            var result = await GetOrderBookAsync(symbol, ct: ct);
+            return result.As(result.Data?.ToCryptoExchangeOrderBook());
         }
 
         async Task<WebCallResult<IEnumerable<UserTrade>?>> IBaseRestClient.GetOrderTradesAsync(string orderId, string? symbol, CancellationToken ct)
@@ -264,20 +270,30 @@ namespace WhiteBit.Net
         {
             return $"{baseAsset}_{quoteAsset}".ToUpper(CultureInfo.InvariantCulture);
         }
-
+        /// <summary>
+        /// Unimplemented yet
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         Task<WebCallResult<IEnumerable<Symbol>>> IBaseRestClient.GetSymbolsAsync(CancellationToken ct)
         {
             throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Unimplemented yet
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         Task<WebCallResult<Ticker>> IBaseRestClient.GetTickerAsync(string symbol, CancellationToken ct)
         {
             throw new NotImplementedException();
         }
 
-        Task<WebCallResult<IEnumerable<Ticker>>> IBaseRestClient.GetTickersAsync(CancellationToken ct)
+        async Task<WebCallResult<IEnumerable<Ticker>?>> IBaseRestClient.GetTickersAsync(CancellationToken ct)
         {
-            throw new NotImplementedException();
+            var result = await GetTickersAsync(ct);
+            return result.As(result.Data?.Select(t => t.ToCryptoExchangeTicker()));
         }
         /// <summary>
         /// 

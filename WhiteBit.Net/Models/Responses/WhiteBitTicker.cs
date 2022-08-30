@@ -14,7 +14,7 @@ namespace WhiteBit.Net.Models.Responses
 
         public string? Symbol { get; set; }
 
-        public Ticker ToCryptoExchangeTicker()
+        internal Ticker ToCryptoExchangeTicker()
         {
             return new Ticker()
             {

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CryptoExchange.Net.CommonObjects;
 using CryptoExchange.Net.Converters;
 using CryptoExchange.Net.Interfaces;
 using Newtonsoft.Json;
@@ -27,6 +28,26 @@ namespace WhiteBit.Net.Models.Responses
         /// </summary>
         [JsonProperty("bids")]
         public IEnumerable<WhiteBitOrderBookEntry> Bids { get; set; } = Array.Empty<WhiteBitOrderBookEntry>();
+
+        internal OrderBook ToCryptoExchangeOrderBook()
+        {
+            return new OrderBook()
+            {
+                SourceObject = this,
+                Asks = Asks
+                    .Select(entry => new OrderBookEntry()
+                    {
+                        Price = entry.Price,
+                        Quantity = entry.Quantity
+                    }),
+                Bids = Bids
+                    .Select(entry => new OrderBookEntry()
+                    {
+                        Price = entry.Price,
+                        Quantity = entry.Quantity
+                    })
+            };
+        }
     }
 
     [JsonConverter(typeof(ArrayConverter))]
