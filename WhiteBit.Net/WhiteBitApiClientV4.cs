@@ -312,8 +312,9 @@ namespace WhiteBit.Net
             WhiteBitPlaceOrderRequest request = type switch
             {
                 CommonOrderType.Market => WhiteBitPlaceOrderRequest.CreateStockMarketOrderRequest(symbol, side.ToWhiteBitOrderSide(), quantity, clientOrderId),
-                CommonOrderType.Limit => WhiteBitPlaceOrderRequest.CreateLimitOrderRequest(symbol, side.ToWhiteBitOrderSide(), quantity, price.Value, clientOrderId),
-                _ => throw new ArgumentException("Unsopported order type, use either Market or Limit")
+                CommonOrderType.Limit when price is null => throw new ArgumentNullException("price should not be null for Limit order"),
+                CommonOrderType.Limit => WhiteBitPlaceOrderRequest.CreateLimitOrderRequest(symbol, side.ToWhiteBitOrderSide(), quantity, price!.Value, clientOrderId),
+                _ => throw new ArgumentException("Unsupported order type, use either Market or Limit")
             };
             var result = await PlaceOrderAsync(request, ct);
             return result.As(!result ? null : new OrderId() { Id = result.Data.OrderId.ToString(), SourceObject = result.Data });
