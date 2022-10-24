@@ -10,6 +10,7 @@ using CryptoExchange.Net.CommonObjects;
 using CryptoExchange.Net.Interfaces.CommonClients;
 using CryptoExchange.Net.Logging;
 using CryptoExchange.Net.Objects;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using WhiteBit.Net.Helpers;
@@ -43,6 +44,7 @@ namespace WhiteBit.Net
         private const string FilledOrdersUrl = "trade-account/order/history";
         private const string OrderTradesUrl = "trade-account/order";
         private const string OwnTradesUrl = "trade-account/executed-history";
+        private const string WebsocketTokenUrl = "profile/websocket_token";
         
 
 
@@ -57,6 +59,20 @@ namespace WhiteBit.Net
 
         public event Action<OrderId>? OnOrderPlaced;
         public event Action<OrderId>? OnOrderCanceled;
+
+        /// <summary>
+        /// This V4 endpoint can be used to retrieve the websocket token for user.
+        /// </summary>
+        internal async Task<string?> GetWebsocketToken( CancellationToken ct = default)
+        {
+            var result =  await SendRequestAsync<JToken>(WebsocketTokenUrl, ct);
+            if (!result)
+            {
+                log.Write(LogLevel.Error, $"Failed to get websocket token:\n {result.Error?.Message}");
+                return null;
+            }
+            return result.Data["websocket_token"]!.ToString();
+        }
 
         #region IWhiteBitApiClientV4 Methods
         ///<inheritdoc/>

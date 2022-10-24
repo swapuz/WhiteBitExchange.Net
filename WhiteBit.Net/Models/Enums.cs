@@ -51,4 +51,33 @@ namespace WhiteBit.Net.Models.Enums
         Maker = 1,
         Taker = 2
     }
+    public enum SocketErrorCode
+    {
+        InvalidArgument = 1,
+        InternalError = 2,
+        ServiceUnavailable = 3,
+        MethodNotFound = 4,
+        ServiceTimeout = 5
+    }
+    public enum SubscriptionStatus
+    {
+        [EnumMember(Value = "success")]
+        Success,
+        [EnumMember(Value = "failed")]
+        Failed
+    }
+
+    public enum SocketMethod
+    {
+        [EnumMember(Value = "authorize")]
+        Authorize,
+        [EnumMember(Value = "balanceSpot_request")]
+        BalanceSpotRequest,
+        [EnumMember(Value = "balanceSpot_subscribe")]
+        BalanceSpotSubscribe,
+        [EnumMember(Value = "balanceSpot_update")]
+        BalanceSpotUpdate,
+        [EnumMember(Value = "balanceSpot_unsubscribe")]
+        BalanceSpotUnsubscribe,
+    }
 }
