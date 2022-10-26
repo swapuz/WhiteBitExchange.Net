@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace WhiteBit.Net.Models.Enums
 {
@@ -29,16 +30,37 @@ namespace WhiteBit.Net.Models.Enums
     public enum WhiteBitOrderType
     {
         [EnumMember(Value = "limit")]
-        Limit,
+        Limit = 1,
         [EnumMember(Value = "market")]
-        Market,
+        Market = 2,
         [EnumMember(Value = "stop limit")]
-        StopLimit,
+        StopLimit = 3,
         [EnumMember(Value = "stop market")]
-        StopMarket,
+        StopMarket = 4,
+        ConditionalLimit = 5,
+        ConditionalMarket = 6,
+        // where is 7???
+        MarginMarket = 8,
+        // and 9?
+        MarginTrigerStopMarket = 10,
         [EnumMember(Value = "stock market")]
         StockMarket
     }
+    
+    /// <summary>
+    /// If new order instantly matches an order from orderbook,
+    /// then you will receive only one message with update event ID equal to 3.
+    /// </summary>
+    public enum SocketOrderUpdateEventType
+    {
+        NewOrder = 1,
+        UpdateOrder = 2,
+        /// <summary>
+        /// Finish order (cancel or execute)
+        /// </summary>
+        FinishOrder = 3
+    }
+
     public enum WhiteBitProductType
     {
         Futures,
@@ -67,6 +89,7 @@ namespace WhiteBit.Net.Models.Enums
         Failed
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum SocketOutgoingMethod
     {
         [EnumMember(Value = "authorize")]

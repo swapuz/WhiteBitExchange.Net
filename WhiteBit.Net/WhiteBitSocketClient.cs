@@ -16,6 +16,7 @@ using WhiteBit.Net.Models;
 using WhiteBit.Net.Models.Enums;
 using WhiteBit.Net.Models.Requests;
 using WhiteBit.Net.Models.Responses;
+using Microsoft.Extensions.Logging;
 
 namespace WhiteBit.Net
 {
@@ -109,27 +110,40 @@ namespace WhiteBit.Net
 
         protected override bool HandleQueryResponse<T>(SocketConnection socketConnection, object request, JToken data, [NotNullWhen(true)] out CallResult<T>? callResult)
         {
-            return HandleResponse(request, data, out callResult);
+            if (!IsResponseMatchesToRequest(request, data))
+            {
+                callResult = null;
+                return false;
+            }
+            var response = data.ToObject<WhiteBitSocketResponse<T>>();
+            callResult = (response is null || response.Result == null) ?
+                                    new CallResult<T>(new ServerError(response!.Error?.ToString() ?? "Empty data came"))
+                                    : new CallResult<T>(response.Result);
+            return true;
         }
 
         protected override bool HandleSubscriptionResponse(SocketConnection socketConnection, SocketSubscription subscription, object request, JToken data, out CallResult<object>? callResult)
         {
-            return HandleResponse(request, data, out callResult);
+            if (!IsResponseMatchesToRequest(request, data))
+            {
+                callResult = null;
+                return false;
+            }
+            log.Write(LogLevel.Trace, $"Socket {socketConnection.SocketId} Subscription completed");
+            callResult = new CallResult<object>(new object());
+            return true;
         }
 
-        private bool HandleResponse<TResult>(object request, JToken data, out CallResult<TResult>? callResult)
+        private bool IsResponseMatchesToRequest(object request, JToken data)
         {
-            callResult = null;
             if (data.Type != JTokenType.Object)
                 return false;
 
-            var wbRequest = (WhiteBitSocketRequest<object>)request;
-            var response = data.ToObject<WhiteBitSocketResponse<TResult>>();
-            if (response?.Id == null)
+            var respId = (int?)data["id"];
+            if (respId == null || respId != ((IWhiteBitSocketDataMethod<SocketOutgoingMethod>)request).Id)
                 return false;
-            callResult = response.Result is null ? new CallResult<TResult>(new ServerError(response.Error?.ToString() ?? "Empty data came"))
-                                                    : new CallResult<TResult>(response.Result);
-            return response.Id == wbRequest.Id;
+
+            return true;
         }
 
         protected override bool MessageMatchesHandler(SocketConnection socketConnection, JToken message, object request)
@@ -156,10 +170,10 @@ namespace WhiteBit.Net
             return result.Data?.Status == SubscriptionStatus.Success;
         }
 
-        internal async Task<CallResult<UpdateSubscription>> SubscribeInternal<TRequest, TResponse>(SocketApiClient apiClient, string url, WhiteBitSocketRequest<TRequest> request, Action<DataEvent<TResponse>> onData, CancellationToken ct)
+        internal async Task<CallResult<UpdateSubscription>> SubscribeInternal<TRequest, TUpdate>(SocketApiClient apiClient, string url, WhiteBitSocketRequest<TRequest> request, bool authenticate, Action<DataEvent<TUpdate>> onData, CancellationToken ct)
         {
             request.Id = NextId();
-            return await SubscribeAsync(apiClient, url.AppendPath("stream"), request, null, false, onData, ct);
+            return await SubscribeAsync(apiClient, url, request, null, authenticate, onData, ct);
         }
     }
 }

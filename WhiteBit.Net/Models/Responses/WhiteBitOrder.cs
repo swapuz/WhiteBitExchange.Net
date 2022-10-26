@@ -178,4 +178,13 @@ namespace WhiteBit.Net.Models.Responses
         [JsonProperty("left")]
         public decimal Left { get; set; }
     }
+
+    [JsonConverter(typeof(ArrayConverter))]
+    public class SocketUpdateOrder
+    {
+        [ArrayProperty(0)]
+        public SocketOrderUpdateEventType Action  { get; set; }
+        [ArrayProperty(1)]
+        public WhiteBitOrder Order { get; set; } = new();
+    }
 }

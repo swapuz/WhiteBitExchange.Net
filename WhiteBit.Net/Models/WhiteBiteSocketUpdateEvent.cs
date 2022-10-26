@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WhiteBit.Net.Interfaces;
 using Newtonsoft.Json;
 using WhiteBit.Net.Models.Enums;
 
 namespace WhiteBit.Net.Models
 {
-    public class WhiteBiteSocketUpdateEvent<TParam>
+    public class WhiteBiteSocketUpdateEvent<TParam> : IWhiteBitSocketDataMethod<SocketIncomeMethod>
     {
         /// <summary>
         /// Id of request. 
@@ -20,7 +21,7 @@ namespace WhiteBit.Net.Models
         /// Name of request.
         /// </summary>
         [JsonProperty("method")]
-        
+
         public SocketIncomeMethod Method { get; set; }
         /// <summary>
         /// Here you pass params for method.
