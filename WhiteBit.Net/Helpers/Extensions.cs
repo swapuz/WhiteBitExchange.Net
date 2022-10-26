@@ -129,5 +129,44 @@ namespace WhiteBit.Net.Helpers
                 _ => WhiteBitOrderSide.Buy
             };
         }
+
+        internal static bool DoesMethodMatch(this SocketOutgoingMethod methodIn, SocketIncomeMethod? methodOut)
+        {
+            switch (methodIn)
+            {
+                case SocketOutgoingMethod.ActiveOrdersSubscribe when methodOut == SocketIncomeMethod.ActiveOrders:
+                case SocketOutgoingMethod.TickerSubscribe when methodOut == SocketIncomeMethod.Ticker:
+                case SocketOutgoingMethod.CandlesSubscribe when methodOut == SocketIncomeMethod.Candles:
+                case SocketOutgoingMethod.LastpriceSubscribe when methodOut == SocketIncomeMethod.Lastprice:
+                case SocketOutgoingMethod.OrderBookSubscribe when methodOut == SocketIncomeMethod.OrderBook:
+                case SocketOutgoingMethod.UserTradesSubscribe when methodOut == SocketIncomeMethod.UserTrades:
+                case SocketOutgoingMethod.BalanceSpotSubscribe when methodOut == SocketIncomeMethod.BalanceSpot:
+                case SocketOutgoingMethod.PublicTradesSubscribe when methodOut == SocketIncomeMethod.PublicTrades:
+                case SocketOutgoingMethod.BalanceMarginSubscribe when methodOut == SocketIncomeMethod.BalanceMargin:
+                case SocketOutgoingMethod.ExecutedOrdersSubscribe when methodOut == SocketIncomeMethod.ExecutedOrders:
+                case SocketOutgoingMethod.MarketStatisticSubscribe when methodOut == SocketIncomeMethod.MarketStatistic:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        internal static SocketOutgoingMethod? GetCorrespondingUnsubscribeMethod(this SocketOutgoingMethod source)
+        {
+            return source switch
+            {
+                SocketOutgoingMethod.ActiveOrdersSubscribe => SocketOutgoingMethod.ActiveOrdersUnsubscribe,
+                SocketOutgoingMethod.TickerSubscribe => SocketOutgoingMethod.TickerUnsubscribe,
+                SocketOutgoingMethod.CandlesSubscribe => SocketOutgoingMethod.CandlesUnsubscribe,
+                SocketOutgoingMethod.LastpriceSubscribe => SocketOutgoingMethod.LastpriceUnsubscribe,
+                SocketOutgoingMethod.OrderBookSubscribe => SocketOutgoingMethod.OrderBookUnsubscribe,
+                SocketOutgoingMethod.UserTradesSubscribe => SocketOutgoingMethod.UserTradesUnsubscribe,
+                SocketOutgoingMethod.BalanceSpotSubscribe => SocketOutgoingMethod.BalanceSpotUnsubscribe,
+                SocketOutgoingMethod.PublicTradesSubscribe => SocketOutgoingMethod.PublicTradesUnsubscribe,
+                SocketOutgoingMethod.BalanceMarginSubscribe => SocketOutgoingMethod.BalanceMarginUnsubscribe,
+                SocketOutgoingMethod.ExecutedOrdersSubscribe => SocketOutgoingMethod.ExecutedOrdersUnsubscribe,
+                SocketOutgoingMethod.MarketStatisticSubscribe => SocketOutgoingMethod.MarketStatisticUnsubscribe,
+                _ => null
+            };
+        }
     }
 }

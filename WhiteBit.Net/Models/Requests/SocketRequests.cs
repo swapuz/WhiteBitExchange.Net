@@ -7,18 +7,19 @@ using WhiteBit.Net.Models.Enums;
 
 namespace WhiteBit.Net.Models.Requests
 {
-    public class BaseSocketRequest<TParam>
+    public class WhiteBitSocketRequest<TParam>
     {
         /// <summary>
-        /// Id of request.
+        /// Id of request. 
+        /// Use internal accessor to hide it from the enduser.
         /// </summary>
         [JsonProperty("id")]
-        public int Id { get; set; }
+        internal int Id { get; set; }
         /// <summary>
         /// Name of request.
         /// </summary>
         [JsonProperty("method")]
-        public SocketMethod Method { get; set; }
+        public SocketOutgoingMethod Method { get; set; }
         /// <summary>
         /// Here you pass params for method.
         /// </summary>
@@ -26,14 +27,23 @@ namespace WhiteBit.Net.Models.Requests
         public IEnumerable<TParam> Parameters { get; set; } = Array.Empty<TParam>();
     }
 
-    internal class AuthorizeSocketRequest : BaseSocketRequest<string>
+    internal class AuthorizeSocketRequest : WhiteBitSocketRequest<string>
     {
-        public AuthorizeSocketRequest(string token, int id = 0)
+        public AuthorizeSocketRequest(int id, string token)
         {
             Id = id;
-            Method = SocketMethod.Authorize;
+            Method = SocketOutgoingMethod.Authorize;
             Parameters = new string[] { token, "public" }; // public is hardcoded 
         }
     }
-    
+
+    internal class UnsubscribeRequest : WhiteBitSocketRequest<string>
+    {
+        public UnsubscribeRequest(int id, SocketOutgoingMethod method)
+        {
+            Id = id;
+            Method = method;
+        }
     }
+
+}

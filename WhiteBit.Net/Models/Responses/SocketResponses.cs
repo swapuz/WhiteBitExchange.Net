@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using WhiteBit.Net.Interfaces;
 using WhiteBit.Net.Models.Enums;
 
 namespace WhiteBit.Net.Models.Responses
 {
-    public class BaseSocketResponse<Tresult>
+    public class WhiteBitSocketResponse<Tresult>
     {
         /// <summary>
         /// Id of request.
@@ -26,13 +27,13 @@ namespace WhiteBit.Net.Models.Responses
         public Tresult? Result { get; set; }
     }
 
-    public class SocketQueryResult
+    public class SocketStatusResult
     {
         [JsonProperty("status")]
         public SubscriptionStatus? Status { get; set; }
     }
 
-    internal class AuthorizeSocketResponse : BaseSocketResponse<SocketQueryResult>
+    internal class AuthorizeSocketResponse : WhiteBitSocketResponse<SocketStatusResult>
     {
         
     }
