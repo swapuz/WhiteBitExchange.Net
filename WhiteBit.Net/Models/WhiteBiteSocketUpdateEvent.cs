@@ -27,6 +27,6 @@ namespace WhiteBit.Net.Models
         /// Here you pass params for method.
         /// </summary>
         [JsonProperty("params")]
-        public IEnumerable<TParam> Parameters { get; set; } = Array.Empty<TParam>();
+        public TParam? Data { get; set; }
     }
 }

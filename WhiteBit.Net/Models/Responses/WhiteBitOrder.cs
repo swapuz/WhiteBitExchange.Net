@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using CryptoExchange.Net.CommonObjects;
 using CryptoExchange.Net.Converters;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using WhiteBit.Net.Helpers;
 using WhiteBit.Net.Interfaces;
 using WhiteBit.Net.Models.Enums;
 
@@ -180,11 +182,11 @@ namespace WhiteBit.Net.Models.Responses
     }
 
     [JsonConverter(typeof(ArrayConverter))]
-    public class SocketUpdateOrder
+    public class OrderSocketUpdate
     {
         [ArrayProperty(0)]
         public SocketOrderUpdateEventType Action  { get; set; }
-        [ArrayProperty(1)]
+        [ArrayProperty(1), JsonConverter(typeof(ObjectJsonConverter<WhiteBitOrder>))]
         public WhiteBitOrder Order { get; set; } = new();
     }
 }

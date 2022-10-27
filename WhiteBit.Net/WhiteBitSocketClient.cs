@@ -148,9 +148,8 @@ namespace WhiteBit.Net
 
         protected override bool MessageMatchesHandler(SocketConnection socketConnection, JToken message, object request)
         {
-            var wbRequest = (WhiteBitSocketRequest<object>)request;
-            var response = message.ToObject<WhiteBiteSocketUpdateEvent<JToken>>();
-            return wbRequest?.Method.DoesMethodMatch(message["method"]?.ToObject<SocketIncomeMethod>()) == true;
+            var methodOut = ((IWhiteBitSocketDataMethod<SocketOutgoingMethod>)request).Method;
+            return methodOut.DoesMethodMatch(message["method"]?.ToObject<SocketIncomeMethod>()) == true;
         }
 
         protected override bool MessageMatchesHandler(SocketConnection socketConnection, JToken message, string identifier)
@@ -170,10 +169,10 @@ namespace WhiteBit.Net
             return result.Data?.Status == SubscriptionStatus.Success;
         }
 
-        internal async Task<CallResult<UpdateSubscription>> SubscribeInternal<TRequest, TUpdate>(SocketApiClient apiClient, string url, WhiteBitSocketRequest<TRequest> request, bool authenticate, Action<DataEvent<TUpdate>> onData, CancellationToken ct)
+        internal async Task<CallResult<UpdateSubscription>> SubscribeInternal<TRequest, TUpdate>(SocketApiClient apiClient, string url, WhiteBitSocketRequest<TRequest> request, bool authenticate, Action<TUpdate?> onData, CancellationToken ct)
         {
             request.Id = NextId();
-            return await SubscribeAsync(apiClient, url, request, null, authenticate, onData, ct);
+            return await SubscribeAsync<WhiteBiteSocketUpdateEvent<TUpdate>>(apiClient, url, request, null, authenticate, (dataWithServiceInfo) => onData(dataWithServiceInfo.Data.Data), ct);
         }
     }
 }
