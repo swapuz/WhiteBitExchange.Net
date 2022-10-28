@@ -19,7 +19,7 @@ using WhiteBit.Net.Models.Enums;
 using WhiteBit.Net.Models.Requests;
 using WhiteBit.Net.Models.Responses;
 
-namespace WhiteBit.Net
+namespace WhiteBit.Net.Clients
 {
     public class WhiteBitApiClientV4 : WhiteBitApiClient, IWhiteBitApiClientV4
     {

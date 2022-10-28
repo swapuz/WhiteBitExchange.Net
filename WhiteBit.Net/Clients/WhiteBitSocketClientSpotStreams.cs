@@ -4,20 +4,21 @@ using CryptoExchange.Net.Logging;
 using CryptoExchange.Net.Objects;
 using CryptoExchange.Net.Sockets;
 using Newtonsoft.Json.Linq;
+using WhiteBit.Net.Clients.Options;
 using WhiteBit.Net.Interfaces;
 using WhiteBit.Net.Models;
 using WhiteBit.Net.Models.Enums;
 using WhiteBit.Net.Models.Requests;
 using WhiteBit.Net.Models.Responses;
 
-namespace WhiteBit.Net
+namespace WhiteBit.Net.Clients
 {
     internal class WhiteBitSocketClientSpotStreams : SocketApiClient, IWhiteBitSocketClientSpotStreams
     {
         private Log _log;
         private WhiteBitSocketClient _whiteBitSocketClient;
         private WhiteBitSocketClientOptions _options;
-
+        private WhiteBitSocketCommonClient _commonClient;
         public WhiteBitSocketClientSpotStreams(Log log, WhiteBitSocketClient whiteBitSocketClient, WhiteBitSocketClientOptions options) :
             base(options, options.SpotStreamsOptions)
         {

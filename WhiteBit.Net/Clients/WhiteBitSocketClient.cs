@@ -17,8 +17,9 @@ using WhiteBit.Net.Models.Enums;
 using WhiteBit.Net.Models.Requests;
 using WhiteBit.Net.Models.Responses;
 using Microsoft.Extensions.Logging;
+using WhiteBit.Net.Clients.Options;
 
-namespace WhiteBit.Net
+namespace WhiteBit.Net.Clients
 {
     public class WhiteBitSocketClient : BaseSocketClient, IWhiteBitSocketClient
     {

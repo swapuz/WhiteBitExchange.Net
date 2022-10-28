@@ -1,7 +1,7 @@
 using System;
 using CryptoExchange.Net.Objects;
 
-namespace WhiteBit.Net
+namespace WhiteBit.Net.Clients.Options
 {
     public class WhiteBitSocketClientOptions : BaseSocketClientOptions
     {

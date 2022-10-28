@@ -1,9 +1,10 @@
 ﻿using CryptoExchange.Net;
 using CryptoExchange.Net.Interfaces.CommonClients;
 using CryptoExchange.Net.Objects;
+using WhiteBit.Net.Clients.Options;
 using WhiteBit.Net.Interfaces;
 
-namespace WhiteBit.Net
+namespace WhiteBit.Net.Clients
 {
     public class WhiteBitClient : BaseRestClient, IWhiteBitClient
     {
