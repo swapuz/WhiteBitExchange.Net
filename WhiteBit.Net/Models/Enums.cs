@@ -29,6 +29,10 @@ namespace WhiteBit.Net.Models.Enums
     /// </summary>
     public enum WhiteBitOrderType
     {
+        /// <summary>
+        /// for filtering only
+        /// </summary>
+        Any = 0,
         [EnumMember(Value = "limit")]
         Limit = 1,
         [EnumMember(Value = "market")]

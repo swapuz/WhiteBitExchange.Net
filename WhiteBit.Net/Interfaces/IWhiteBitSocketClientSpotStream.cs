@@ -10,7 +10,7 @@ using WhiteBit.Net.Models.Responses;
 
 namespace WhiteBit.Net.Interfaces
 {
-    public interface IWhiteBitSocketClientSpotStreams
+    public interface IWhiteBitSocketClientSpotStream
     {
 
         // Task<CallResult<UpdateSubscription>> SubscribeToOrderBookAsync(string symbol, Action<WhiteBitSocketResponse<>> dataHandler);
@@ -26,5 +26,13 @@ namespace WhiteBit.Net.Interfaces
         Task<CallResult<UpdateSubscription>> SubscribeToActiveOrders(Action<OrderSocketUpdate?>
          dataHandler, CancellationToken ct = default, params string[] symbols);
 
+        /// <summary>
+        /// Subscribe to receive updates in spot balances.
+        /// </summary>
+        /// <param name="dataHandler">The handler of update data</param>
+        /// <param name="ct">Cancellation token for closing this subscription</param>
+        /// <param name="symbols"></param>
+        /// <returns></returns>
+        Task<CallResult<UpdateSubscription>> SubscribeToTradingBalance(Action<IEnumerable<WhiteBitTradingBalance>> dataHandler, CancellationToken ct = default, params string[] symbols);
     }
 }

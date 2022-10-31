@@ -5,6 +5,7 @@ using CryptoExchange.Net.Objects;
 using CryptoExchange.Net.Sockets;
 using Newtonsoft.Json.Linq;
 using WhiteBit.Net.Clients.Options;
+using WhiteBit.Net.Helpers;
 using WhiteBit.Net.Interfaces;
 using WhiteBit.Net.Models;
 using WhiteBit.Net.Models.Enums;
@@ -13,36 +14,21 @@ using WhiteBit.Net.Models.Responses;
 
 namespace WhiteBit.Net.Clients
 {
-    internal class WhiteBitSocketClientSpotStreams : SocketApiClient, IWhiteBitSocketClientSpotStreams
+    public class WhiteBitSocketClientSpotStream : WhiteBitSocketCommonClient, IWhiteBitSocketClientSpotStream
     {
-        private Log _log;
-        private WhiteBitSocketClient _whiteBitSocketClient;
-        private WhiteBitSocketClientOptions _options;
-        private WhiteBitSocketCommonClient _commonClient;
-        public WhiteBitSocketClientSpotStreams(Log log, WhiteBitSocketClient whiteBitSocketClient, WhiteBitSocketClientOptions options) :
-            base(options, options.SpotStreamsOptions)
+        public WhiteBitSocketClientSpotStream(Log log, WhiteBitSocketClient whiteBitSocketClient, WhiteBitSocketClientOptions options) :
+            base(log, whiteBitSocketClient, options)
         {
-            this._log = log;
-            this._whiteBitSocketClient = whiteBitSocketClient;
-            this._options = options;
         }
-
-        public async Task<CallResult<UpdateSubscription>> SubscribeToActiveOrders(Action<OrderSocketUpdate?> dataHandler, CancellationToken ct = default, params string[] symbols)
+        ///<inheritdoc/>
+        public async Task<CallResult<UpdateSubscription>> SubscribeToTradingBalance(Action<IEnumerable<WhiteBitTradingBalance>> dataHandler, CancellationToken ct = default, params string[] symbols)
         {
-            return await SubscribeInternal(
-                new WhiteBitSocketRequest<string>(SocketOutgoingMethod.ActiveOrdersSubscribe, symbols),
+            return await SubscribeInternal<string, IEnumerable<Dictionary<string, WhiteBitRawTradingBalance>>>(
+                new WhiteBitSocketRequest<string>(SocketOutgoingMethod.BalanceSpotSubscribe, symbols.ToUpper()),
                 true,
-                dataHandler,
+                balAsDict => { dataHandler(balAsDict!.SelectMany(x => x).Select(b => b.Value.Convert(new WhiteBitTradingBalance { Currency = b.Key })!)); },
                 ct
             );
-        }
-
-        protected override AuthenticationProvider CreateAuthenticationProvider(ApiCredentials credentials) 
-            => new WhiteBitAuthenticationProvider(credentials);
-
-        private async Task<CallResult<UpdateSubscription>> SubscribeInternal<TRequest, TUpdate>(WhiteBitSocketRequest<TRequest> request, bool authenticate, Action<TUpdate?> onData, CancellationToken ct)
-        {
-            return await _whiteBitSocketClient.SubscribeInternal(this, BaseAddress, request, authenticate, onData, ct);
         }
     }
 }

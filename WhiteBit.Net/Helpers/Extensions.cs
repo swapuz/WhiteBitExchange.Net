@@ -168,5 +168,6 @@ namespace WhiteBit.Net.Helpers
                 _ => null
             };
         }
+        internal static string[] ToUpper(this string[] source) => source.Select(str => str.ToUpper()).ToArray();
     }
 }

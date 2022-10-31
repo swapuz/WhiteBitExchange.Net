@@ -42,10 +42,12 @@ namespace WhiteBit.Net.Clients
         {
             SetDataInterpreter((data) => string.Empty, null);
             // RateLimitPerSocketPerSecond = 4;
-            SpotStreams = AddApiClient(new WhiteBitSocketClientSpotStreams(log, this, options));
+            SpotStreams = AddApiClient(new WhiteBitSocketClientSpotStream(log, this, options));
+            MarginStreams = AddApiClient(new WhiteBitSocketClientMarginStream(log, this, options));
         }
         #endregion 
-        public IWhiteBitSocketClientSpotStreams SpotStreams { get; set; }
+        public IWhiteBitSocketClientSpotStream SpotStreams { get; set; }
+        public IWhiteBitSocketClientMarginStream MarginStreams { get; set; }
 
         private static async Task<string?> GetWebsocketToken(AuthenticationProvider authProvider)
         {
@@ -155,8 +157,6 @@ namespace WhiteBit.Net.Clients
 
         protected override bool MessageMatchesHandler(SocketConnection socketConnection, JToken message, string identifier)
         {
-            // check it!
-            Console.WriteLine($"MessageMatchesHandler invoked with {identifier}");
             return true;
         }
 
@@ -170,10 +170,16 @@ namespace WhiteBit.Net.Clients
             return result.Data?.Status == SubscriptionStatus.Success;
         }
 
-        internal async Task<CallResult<UpdateSubscription>> SubscribeInternal<TRequest, TUpdate>(SocketApiClient apiClient, string url, WhiteBitSocketRequest<TRequest> request, bool authenticate, Action<TUpdate?> onData, CancellationToken ct)
+        internal async Task<CallResult<UpdateSubscription>> SubscribeInternal<TRequest, TUpdate>
+            (SocketApiClient apiClient,
+            string url,
+            WhiteBitSocketRequest<TRequest> request,
+            bool authenticate,
+            Action<DataEvent<TUpdate>> onData,
+            CancellationToken ct)
         {
             request.Id = NextId();
-            return await SubscribeAsync<WhiteBiteSocketUpdateEvent<TUpdate>>(apiClient, url, request, null, authenticate, (dataWithServiceInfo) => onData(dataWithServiceInfo.Data.Data), ct);
+            return await SubscribeAsync(apiClient, url, request, null, authenticate, onData, ct);
         }
     }
 }
