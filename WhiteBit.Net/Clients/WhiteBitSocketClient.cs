@@ -75,7 +75,7 @@ namespace WhiteBit.Net.Clients
         }
         protected override async Task<CallResult<bool>> AuthenticateSocketAsync(SocketConnection socketConnection)
         {
-            // should I check this condition
+            // should I check this condition?
             if (socketConnection.ApiClient.AuthenticationProvider is null)
                 return new CallResult<bool>(false);
             bool isSuccess = false;
@@ -120,20 +120,19 @@ namespace WhiteBit.Net.Clients
             }
             var response = data.ToObject<WhiteBitSocketResponse<T>>();
             callResult = (response is null || response.Result == null) ?
-                                    new CallResult<T>(new ServerError(response!.Error?.ToString() ?? "Empty data came"))
+                                    new CallResult<T>(new ServerError((int) (response?.Error?.Error ?? 0), response?.Error?.ToString() ?? "Empty data came"))
                                     : new CallResult<T>(response.Result);
             return true;
         }
 
         protected override bool HandleSubscriptionResponse(SocketConnection socketConnection, SocketSubscription subscription, object request, JToken data, out CallResult<object>? callResult)
         {
-            if (!IsResponseMatchesToRequest(request, data))
+            if(!HandleQueryResponse(socketConnection, request, data, out callResult))
             {
-                callResult = null;
                 return false;
             }
-            log.Write(LogLevel.Trace, $"Socket {socketConnection.SocketId} Subscription completed");
-            callResult = new CallResult<object>(new object());
+            if (callResult.Success)
+                log.Write(LogLevel.Trace, $"Socket {socketConnection.SocketId} Subscription completed");
             return true;
         }
 
