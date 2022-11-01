@@ -54,7 +54,17 @@ namespace WhiteBit.Net.Clients
                 ct
             );
         }
-
+        /// <inheritdoc/>
+        public async Task<CallResult<UpdateSubscription>> SubscribeToUserTrades(Action<WhiteBitUserTrade> dataHandler, CancellationToken ct = default, params string[] symbols)
+        {
+            return await SubscribeInternal<string, WhiteBitUserTradeAsArray>(
+                new WhiteBitSocketRequest<string>(SocketOutgoingMethod.UserTradesSubscribe, symbols.ToUpper()),
+                true,
+                tradeAsArray => dataHandler(tradeAsArray!.Convert()!),
+                ct
+            );
+        }
+        
         protected override AuthenticationProvider CreateAuthenticationProvider(ApiCredentials credentials)
             => new WhiteBitAuthenticationProvider(credentials);
 
