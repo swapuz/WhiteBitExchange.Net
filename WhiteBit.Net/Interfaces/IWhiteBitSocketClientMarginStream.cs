@@ -7,7 +7,7 @@ using CryptoExchange.Net.Sockets;
 
 namespace WhiteBit.Net.Interfaces
 {
-    public interface IWhiteBitSocketClientMarginStream
+    public interface IWhiteBitSocketClientMarginStream : IWhiteBitSocketClientCommonStream
     {
         /// <summary>
         /// Subscribe to receive updates in margin balances.

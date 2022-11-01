@@ -9,6 +9,7 @@ using CryptoExchange.Net.Objects;
 using CryptoExchange.Net.Sockets;
 using WhiteBit.Net.Clients.Options;
 using WhiteBit.Net.Helpers;
+using WhiteBit.Net.Interfaces;
 using WhiteBit.Net.Models;
 using WhiteBit.Net.Models.Enums;
 using WhiteBit.Net.Models.Requests;
@@ -16,7 +17,7 @@ using WhiteBit.Net.Models.Responses;
 
 namespace WhiteBit.Net.Clients
 {
-    public abstract class WhiteBitSocketCommonClient : SocketApiClient
+    public abstract class WhiteBitSocketCommonClient : SocketApiClient, IWhiteBitSocketClientCommonStream
     {
         protected Log _log;
         protected WhiteBitSocketClient _whiteBitSocketClient;
@@ -27,6 +28,7 @@ namespace WhiteBit.Net.Clients
             this._whiteBitSocketClient = whiteBitSocketClient;
         }
 
+        ///<inheritdoc/>>
         public async Task<CallResult<UpdateSubscription>> SubscribeToActiveOrders(Action<OrderSocketUpdate?> dataHandler, CancellationToken ct = default, params string[] symbols)
         {
             return await SubscribeInternal(
@@ -36,14 +38,7 @@ namespace WhiteBit.Net.Clients
                 ct
             );
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="dataHandler">>The handler of update data</param>
-        /// <param name="ct">Cancellation token for closing this subscription</param>
-        /// <param name="filter">allowed only one of Limit (for all Limit types), Market (for all Market types) or Any</param>
-        /// <param name="symbols"></param>
-        /// <returns></returns>
+        /// <inheritdoc/>
         public async Task<CallResult<UpdateSubscription>> SubscribeToExecutedOrders(Action<IEnumerable<WhiteBitOrder>?> dataHandler, CancellationToken ct = default, WhiteBitOrderType filter = WhiteBitOrderType.Any, params string[] symbols)
         {
             filter = (int)filter > 2 ? WhiteBitOrderType.Any : filter;
@@ -64,7 +59,38 @@ namespace WhiteBit.Net.Clients
                 ct
             );
         }
-        
+        /// <inheritdoc/>
+        public async Task<CallResult<UpdateSubscription>> SubscribeToCurrentCandles(Action<IEnumerable<WhiteBitCandle>> dataHandler, string symbol, int intervalInSeconds, CancellationToken ct = default)
+        {
+            return await SubscribeInternal(
+                new WhiteBitSocketRequest<object>(SocketOutgoingMethod.CandlesSubscribe, new List<object>() { symbol, intervalInSeconds }),
+                false,
+                dataHandler!,
+                ct
+            );
+        }
+        /// <inheritdoc/>
+public async Task<CallResult<UpdateSubscription>> SubscribeToRecentlyClosedCandles(Action<WhiteBitCandle> dataHandler, string symbol, int intervalInSeconds, CancellationToken ct = default)
+{
+    WhiteBitCandle? latestCandle = null;
+    return await SubscribeToCurrentCandles(
+        openCandles => 
+        {
+            foreach (var candle in openCandles)
+            {
+                if (latestCandle?.Timestamp < candle.Timestamp )
+                {
+                    dataHandler(latestCandle);
+                }
+                latestCandle = candle;
+            }
+        },
+        symbol,
+        intervalInSeconds,
+        ct
+    );
+}
+
         protected override AuthenticationProvider CreateAuthenticationProvider(ApiCredentials credentials)
             => new WhiteBitAuthenticationProvider(credentials);
 

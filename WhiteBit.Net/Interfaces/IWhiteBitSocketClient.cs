@@ -12,6 +12,6 @@ namespace WhiteBit.Net.Interfaces
         /// Spot streams
         /// </summary>
         IWhiteBitSocketClientSpotStream SpotStreams { get; }
-        // IWhiteBitSocketClientMarginStreams MarginStreams { get; }
+        IWhiteBitSocketClientMarginStream MarginStreams { get; }
     }
 }
