@@ -57,8 +57,8 @@ namespace WhiteBit.Net.Clients
         /// <inheritdoc/>
         public async Task<CallResult<UpdateSubscription>> SubscribeToUserTrades(Action<WhiteBitUserTrade> dataHandler, CancellationToken ct = default, params string[] symbols)
         {
-            return await SubscribeInternal<string, WhiteBitUserTradeAsArray>(
-                new WhiteBitSocketRequest<string>(SocketOutgoingMethod.UserTradesSubscribe, symbols.ToUpper()),
+            return await SubscribeInternal<IEnumerable<string>, WhiteBitUserTradeAsArray>(
+                new WhiteBitSocketRequest<IEnumerable<string>>(SocketOutgoingMethod.UserTradesSubscribe, new List<IEnumerable<string>>() {symbols.ToUpper()}),
                 true,
                 tradeAsArray => dataHandler(tradeAsArray!.Convert()!),
                 ct

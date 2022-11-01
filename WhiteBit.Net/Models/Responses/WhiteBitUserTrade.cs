@@ -76,19 +76,19 @@ namespace WhiteBit.Net.Models.Responses
         public long TradeId { get; set; }
         [ArrayProperty(1)]
         [JsonConverter(typeof(DateTimeConverter))]
-        internal DateTime Timestamp {get; set; }
+        public DateTime Timestamp {get; set; }
         [ArrayProperty(2)]
-        internal string? Symbol { get; set; }
+        public string? Symbol { get; set; }
         [ArrayProperty(3)]
-        internal long? OrderId { get; set; }
+        public long? OrderId { get; set; }
         [ArrayProperty(4)]
-        internal decimal Price { get;  set;}
+        public decimal Price { get;  set;}
         [ArrayProperty(5)]
-        internal decimal QuoteVolume { get; set; }
+        public decimal BaseVolume { get; set; }
         [ArrayProperty(6)]
-        internal decimal Fee { get; set; }
+        public decimal Fee { get; set; }
         [ArrayProperty(7)]
-        internal string? ClientOrderId { get; set; }
+        public string? ClientOrderId { get; set; }
         
     }
 }
