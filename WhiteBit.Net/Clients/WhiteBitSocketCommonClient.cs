@@ -70,26 +70,30 @@ namespace WhiteBit.Net.Clients
             );
         }
         /// <inheritdoc/>
-public async Task<CallResult<UpdateSubscription>> SubscribeToRecentlyClosedCandles(Action<WhiteBitCandle> dataHandler, string symbol, int intervalInSeconds, CancellationToken ct = default)
-{
-    WhiteBitCandle? latestCandle = null;
-    return await SubscribeToCurrentCandles(
-        openCandles => 
+        public async Task<CallResult<UpdateSubscription>> SubscribeToRecentlyClosedCandles(Action<WhiteBitCandle> dataHandler, string symbol, int intervalInSeconds, CancellationToken ct = default)
         {
-            foreach (var candle in openCandles)
-            {
-                if (latestCandle?.Timestamp < candle.Timestamp )
+            WhiteBitCandle? latestCandle = null;
+            var loker = new object();
+            return await SubscribeToCurrentCandles(
+                openCandles => 
                 {
-                    dataHandler(latestCandle);
-                }
-                latestCandle = candle;
-            }
-        },
-        symbol,
-        intervalInSeconds,
-        ct
-    );
-}
+                    lock(loker)
+                        foreach (var candle in openCandles)
+                        {
+                            if (latestCandle?.Timestamp > candle.Timestamp)
+                                continue; // old candle may be sent twice by whitebit, skip second handling
+                            if (latestCandle?.Timestamp < candle.Timestamp )
+                            {
+                                dataHandler(latestCandle);
+                            }
+                            latestCandle = candle;
+                        }
+                },
+                symbol,
+                intervalInSeconds,
+                ct
+            );
+        }
 
         protected override AuthenticationProvider CreateAuthenticationProvider(ApiCredentials credentials)
             => new WhiteBitAuthenticationProvider(credentials);
