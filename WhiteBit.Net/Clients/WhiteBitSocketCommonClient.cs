@@ -94,7 +94,16 @@ namespace WhiteBit.Net.Clients
                 ct
             );
         }
-
+        /// <inheritdoc/>
+        public async Task<CallResult<UpdateSubscription>> SubscribeToLastPrice(Action<LastPrice> dataHandler, CancellationToken ct = default, params string[] symbols)
+        {
+            return await SubscribeInternal(
+                new WhiteBitSocketRequest<string>(SocketOutgoingMethod.LastpriceSubscribe, symbols),
+                false,
+                dataHandler!,
+                ct
+            );
+        }
         protected override AuthenticationProvider CreateAuthenticationProvider(ApiCredentials credentials)
             => new WhiteBitAuthenticationProvider(credentials);
 
