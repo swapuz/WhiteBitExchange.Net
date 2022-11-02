@@ -91,7 +91,21 @@ namespace WhiteBit.Net.Interfaces
         /// <param name="symbols">place one or more symbols to subscribe</param>
         /// <returns></returns>
         Task<CallResult<UpdateSubscription>> SubscribeToUtcDayStartTicker(Action<WhiteBitTicker> dataHandler, CancellationToken ct = default, params string[] symbols);
+        /// <summary>
+        /// Market statistics for current day UTC
+        /// </summary>
+        /// <param name="dataHandler">The handler of update data</param>
+        /// <param name="ct">Cancellation token for closing this subscription</param>
+        /// <param name="symbols">place one or more symbols to subscribe</param>
+        /// <returns></returns>
         Task<CallResult<UpdateSubscription>> SubscribeTo24HAgoTicker(Action<WhiteBitCustomPeriodTicker> dataHandler, CancellationToken ct = default, params string[] symbols);
-
+        /// <summary>
+        /// Market trades
+        /// </summary>
+        /// <param name="dataHandler">The handler of update data</param>
+        /// <param name="ct">Cancellation token for closing this subscription</param>
+        /// <param name="symbols">place one or more symbols to subscribe</param>
+        /// <returns></returns>
+        Task<CallResult<UpdateSubscription>> SubscribeToPublicTrades(Action<KeyValuePair<string, IEnumerable<WhiteBitPublicTrade>>> dataHandler, CancellationToken ct = default, params string[] symbols);
     }
 }

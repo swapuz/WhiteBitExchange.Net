@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CryptoExchange.Net.CommonObjects;
 using CryptoExchange.Net.Converters;
 using Newtonsoft.Json;
+using WhiteBit.Net.Helpers;
 using WhiteBit.Net.Interfaces;
 using WhiteBit.Net.Models.Enums;
 
@@ -80,5 +81,14 @@ namespace WhiteBit.Net.Models.Responses
         protected decimal Quantity => BaseVolume;
 
         #endregion
+    }
+
+    [JsonConverter(typeof(ArrayConverter))]
+    internal class publicTradesAsArray
+    {
+        [ArrayProperty(0)]
+        public string Symbol { get; set; } = string.Empty;
+        [ArrayProperty(1), JsonConverter(typeof(ObjectJsonConverter<List<WhiteBitPublicTrade>>))]
+        public IEnumerable<WhiteBitPublicTrade> Body { get; set; } = Array.Empty<WhiteBitPublicTrade>();
     }
 }

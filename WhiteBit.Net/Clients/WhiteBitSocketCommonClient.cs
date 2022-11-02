@@ -133,6 +133,28 @@ namespace WhiteBit.Net.Clients
                 ct
             );
         }
+        /// <inheritdoc/>
+        public async Task<CallResult<UpdateSubscription>> SubscribeToPublicTrades(
+            Action<KeyValuePair<string, IEnumerable<WhiteBitPublicTrade>>> dataHandler,
+            CancellationToken ct = default,
+            params string[] symbols)
+        {
+            return await SubscribeInternal<string, publicTradesAsArray>(
+                new WhiteBitSocketRequest<string>(SocketOutgoingMethod.PublicTradesSubscribe, symbols),
+                false,
+                rawTrades =>
+                {
+                    rawTrades!.Body.ToList().ForEach(trade => 
+                        { 
+                            trade.Symbol = rawTrades.Symbol;
+                            trade.QuoteVolume = trade.Price * trade.BaseVolume;
+                        });
+
+                    dataHandler(new KeyValuePair<string, IEnumerable<WhiteBitPublicTrade>>(rawTrades.Symbol, rawTrades.Body));
+                },
+                ct
+            );
+        }
         protected override AuthenticationProvider CreateAuthenticationProvider(ApiCredentials credentials)
             => new WhiteBitAuthenticationProvider(credentials);
 
@@ -148,7 +170,7 @@ namespace WhiteBit.Net.Clients
                 request,
                 authenticate,
                 (dataWithServiceInfo) => onData(dataWithServiceInfo.Data.Data),
-                ct);
+                ct).ConfigureAwait(false);
         }
     }
 }
