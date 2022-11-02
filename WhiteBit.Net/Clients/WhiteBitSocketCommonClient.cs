@@ -104,6 +104,35 @@ namespace WhiteBit.Net.Clients
                 ct
             );
         }
+        /// <inheritdoc/>
+        public async Task<CallResult<UpdateSubscription>> SubscribeToUtcDayStartTicker(Action<WhiteBitTicker> dataHandler, CancellationToken ct = default, params string[] symbols)
+        {
+            return await SubscribeInternal<string, WhiteBitTickerAsArray>(
+                new WhiteBitSocketRequest<string>(SocketOutgoingMethod.TickerUtcDaySubscribe, symbols),
+                false,
+                rawTicker => {
+                    var ticker = rawTicker!.Body;
+                    ticker!.Symbol = rawTicker.Symbol!;
+                    dataHandler(ticker);
+                },
+                ct
+            );
+        }
+        /// <inheritdoc/>
+        public async Task<CallResult<UpdateSubscription>> SubscribeTo24HAgoTicker(Action<WhiteBitCustomPeriodTicker> dataHandler, CancellationToken ct = default, params string[] symbols)
+        {
+            return await SubscribeInternal<string, WhiteBitCustomPeriodTickerAsArray>(
+                new WhiteBitSocketRequest<string>(SocketOutgoingMethod.Ticker24HSubscribe, symbols),
+                false,
+                rawTicker =>
+                {
+                    var ticker = rawTicker!.Body;
+                    ticker!.Symbol = rawTicker.Symbol!;
+                    dataHandler(ticker);
+                },
+                ct
+            );
+        }
         protected override AuthenticationProvider CreateAuthenticationProvider(ApiCredentials credentials)
             => new WhiteBitAuthenticationProvider(credentials);
 

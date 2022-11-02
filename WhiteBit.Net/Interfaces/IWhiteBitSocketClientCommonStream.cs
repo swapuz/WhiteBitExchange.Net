@@ -83,6 +83,15 @@ namespace WhiteBit.Net.Interfaces
         /// Equal to 86400 * 30.</param>
         /// <returns></returns>
         Task<CallResult<UpdateSubscription>> SubscribeToRecentlyClosedCandles(Action<WhiteBitCandle> dataHandler, string symbol, int intervalInSeconds, CancellationToken ct = default);
+        /// <summary>
+        /// Market statistics for current day UTC
+        /// </summary>
+        /// <param name="dataHandler">The handler of update data</param>
+        /// <param name="ct">Cancellation token for closing this subscription</param>
+        /// <param name="symbols">place one or more symbols to subscribe</param>
+        /// <returns></returns>
+        Task<CallResult<UpdateSubscription>> SubscribeToUtcDayStartTicker(Action<WhiteBitTicker> dataHandler, CancellationToken ct = default, params string[] symbols);
+        Task<CallResult<UpdateSubscription>> SubscribeTo24HAgoTicker(Action<WhiteBitCustomPeriodTicker> dataHandler, CancellationToken ct = default, params string[] symbols);
 
     }
 }

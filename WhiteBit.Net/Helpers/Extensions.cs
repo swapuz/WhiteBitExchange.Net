@@ -135,7 +135,7 @@ namespace WhiteBit.Net.Helpers
             switch (methodIn)
             {
                 case SocketOutgoingMethod.ActiveOrdersSubscribe when methodOut == SocketIncomeMethod.ActiveOrders:
-                case SocketOutgoingMethod.TickerSubscribe when methodOut == SocketIncomeMethod.Ticker:
+                case SocketOutgoingMethod.TickerUtcDaySubscribe when methodOut == SocketIncomeMethod.TickerUtcDay:
                 case SocketOutgoingMethod.CandlesSubscribe when methodOut == SocketIncomeMethod.Candles:
                 case SocketOutgoingMethod.LastpriceSubscribe when methodOut == SocketIncomeMethod.Lastprice:
                 case SocketOutgoingMethod.OrderBookSubscribe when methodOut == SocketIncomeMethod.OrderBook:
@@ -144,7 +144,7 @@ namespace WhiteBit.Net.Helpers
                 case SocketOutgoingMethod.PublicTradesSubscribe when methodOut == SocketIncomeMethod.PublicTrades:
                 case SocketOutgoingMethod.BalanceMarginSubscribe when methodOut == SocketIncomeMethod.BalanceMargin:
                 case SocketOutgoingMethod.ExecutedOrdersSubscribe when methodOut == SocketIncomeMethod.ExecutedOrders:
-                case SocketOutgoingMethod.MarketStatisticSubscribe when methodOut == SocketIncomeMethod.MarketStatistic:
+                case SocketOutgoingMethod.Ticker24HSubscribe when methodOut == SocketIncomeMethod.Ticker24H:
                     return true;
                 default:
                     return false;
@@ -155,7 +155,7 @@ namespace WhiteBit.Net.Helpers
             return source switch
             {
                 SocketOutgoingMethod.ActiveOrdersSubscribe => SocketOutgoingMethod.ActiveOrdersUnsubscribe,
-                SocketOutgoingMethod.TickerSubscribe => SocketOutgoingMethod.TickerUnsubscribe,
+                SocketOutgoingMethod.TickerUtcDaySubscribe => SocketOutgoingMethod.TickerUtcDayUnsubscribe,
                 SocketOutgoingMethod.CandlesSubscribe => SocketOutgoingMethod.CandlesUnsubscribe,
                 SocketOutgoingMethod.LastpriceSubscribe => SocketOutgoingMethod.LastpriceUnsubscribe,
                 SocketOutgoingMethod.OrderBookSubscribe => SocketOutgoingMethod.OrderBookUnsubscribe,
@@ -164,7 +164,7 @@ namespace WhiteBit.Net.Helpers
                 SocketOutgoingMethod.PublicTradesSubscribe => SocketOutgoingMethod.PublicTradesUnsubscribe,
                 SocketOutgoingMethod.BalanceMarginSubscribe => SocketOutgoingMethod.BalanceMarginUnsubscribe,
                 SocketOutgoingMethod.ExecutedOrdersSubscribe => SocketOutgoingMethod.ExecutedOrdersUnsubscribe,
-                SocketOutgoingMethod.MarketStatisticSubscribe => SocketOutgoingMethod.MarketStatisticUnsubscribe,
+                SocketOutgoingMethod.Ticker24HSubscribe => SocketOutgoingMethod.Ticker24HUnsubscribe,
                 _ => null
             };
         }

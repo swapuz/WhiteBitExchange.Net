@@ -163,22 +163,22 @@ namespace WhiteBit.Net.Models.Enums
         LastpriceUnsubscribe,
 
         [EnumMember(Value = "market_request")]
-        MarketStatisticRequest,
+        Ticker24HRequest,
 
         [EnumMember(Value = "market_subscribe")]
-        MarketStatisticSubscribe,
+        Ticker24HSubscribe,
 
         [EnumMember(Value = "market_unsubscribe")]
-        MarketStatisticUnsubscribe,
+        Ticker24HUnsubscribe,
 
         [EnumMember(Value = "marketToday_request")]
-        TickerRequest,
+        TickerUtcDayRequest,
 
         [EnumMember(Value = "marketToday_subscribe")]
-        TickerSubscribe,
+        TickerUtcDaySubscribe,
 
         [EnumMember(Value = "marketToday_unsubscribe")]
-        TickerUnsubscribe,
+        TickerUtcDayUnsubscribe,
 
         [EnumMember(Value = "trades_request")]
         PublicTradesRequest,
@@ -222,10 +222,10 @@ namespace WhiteBit.Net.Models.Enums
         Lastprice,
 
         [EnumMember(Value = "market_update")]
-        MarketStatistic,
+        Ticker24H,
 
         [EnumMember(Value = "marketToday_update")]
-        Ticker,
+        TickerUtcDay,
 
         [EnumMember(Value = "trades_update")]
         PublicTrades,
