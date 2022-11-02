@@ -91,10 +91,10 @@ namespace WhiteBit.Net.Clients
         }
 
         ///<inheritdoc/>
-        public async Task<WebCallResult<IEnumerable<WhiteBitTicker>?>> GetTickersAsync(CancellationToken ct = default)
+        public async Task<WebCallResult<IEnumerable<WhiteBitRestTicker>?>> GetTickersAsync(CancellationToken ct = default)
         {
             var result =  await SendRequestAsync<Dictionary<string,WhiteBitRawTicker>>(TickerUrl, ct);
-            return result.As(result.Data?.Select(b => b.Value.Convert(new WhiteBitTicker { Symbol = b.Key })!));
+            return result.As(result.Data?.Select(b => b.Value.Convert(new WhiteBitRestTicker { Symbol = b.Key })!));
         }
 
         ///<inheritdoc/>

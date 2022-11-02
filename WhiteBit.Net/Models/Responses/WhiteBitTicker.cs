@@ -9,7 +9,7 @@ using WhiteBit.Net.Interfaces;
 
 namespace WhiteBit.Net.Models.Responses
 {
-    public class WhiteBitTicker : WhiteBitRawTicker
+    public class WhiteBitRestTicker : WhiteBitRawTicker
     {
 
         public string? Symbol { get; set; }
@@ -25,7 +25,7 @@ namespace WhiteBit.Net.Models.Responses
             };
         }
     }
-    public class WhiteBitRawTicker : IConvertible<WhiteBitTicker>
+    public class WhiteBitRawTicker : IConvertible<WhiteBitRestTicker>
     {
 
         /// <summary>
