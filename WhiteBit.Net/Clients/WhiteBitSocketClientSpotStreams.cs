@@ -16,7 +16,7 @@ namespace WhiteBit.Net.Clients
 {
     public class WhiteBitSocketClientSpotStream : WhiteBitSocketCommonClient, IWhiteBitSocketClientSpotStream
     {
-        public WhiteBitSocketClientSpotStream(Log log, WhiteBitSocketClient whiteBitSocketClient, WhiteBitSocketClientOptions options) :
+        internal WhiteBitSocketClientSpotStream(Log log, WhiteBitSocketClient whiteBitSocketClient, WhiteBitSocketClientOptions options) :
             base(log, whiteBitSocketClient, options)
         {
         }

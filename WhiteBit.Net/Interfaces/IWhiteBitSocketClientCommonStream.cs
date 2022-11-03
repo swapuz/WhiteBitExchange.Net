@@ -31,6 +31,7 @@ namespace WhiteBit.Net.Interfaces
         /// <param name="symbols"></param>
         /// <returns></returns>
         Task<CallResult<UpdateSubscription>> SubscribeToExecutedOrders(Action<IEnumerable<WhiteBitOrder>?> dataHandler, CancellationToken ct = default, WhiteBitOrderType filter = WhiteBitOrderType.Any, params string[] symbols);
+
         /// <summary>
         /// 
         /// </summary>
@@ -107,5 +108,13 @@ namespace WhiteBit.Net.Interfaces
         /// <param name="symbols">place one or more symbols to subscribe</param>
         /// <returns></returns>
         Task<CallResult<UpdateSubscription>> SubscribeToPublicTrades(Action<KeyValuePair<string, IEnumerable<WhiteBitPublicTrade>>> dataHandler, CancellationToken ct = default, params string[] symbols);
+        
+        Task<CallResult<UpdateSubscription>> SubscribeToOrderBook(
+            Action<WhiteBitSocketOrderBook> onUpdate,
+            string symbol,
+            int maxEntriesAmount = 100,
+            OrderBookSocketAggregationLevel aggregationLevel = OrderBookSocketAggregationLevel.NoAggregation,
+            CancellationToken ct = default);
+
     }
 }

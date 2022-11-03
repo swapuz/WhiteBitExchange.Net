@@ -16,7 +16,7 @@ namespace WhiteBit.Net.Clients
 {
     public class WhiteBitSocketClientMarginStream : WhiteBitSocketCommonClient, IWhiteBitSocketClientMarginStream
     {
-        public WhiteBitSocketClientMarginStream(Log log, WhiteBitSocketClient whiteBitSocketClient, WhiteBitSocketClientOptions options) :
+        internal WhiteBitSocketClientMarginStream(Log log, WhiteBitSocketClient whiteBitSocketClient, WhiteBitSocketClientOptions options) :
             base(log, whiteBitSocketClient, options)
         {
         }

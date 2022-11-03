@@ -12,10 +12,10 @@ namespace WhiteBit.Net.Clients.Options
         /// </summary>
         public static WhiteBitSocketClientOptions Default { get; set; } = new WhiteBitSocketClientOptions()
         {
-            SocketSubscriptionsCombineTarget = 10
+            SocketSubscriptionsCombineTarget = 25
         };
 
-        internal ApiClientOptions SpotStreamsOptions { get; set; } = new ApiClientOptions(SocketEndpoint);
+        internal ApiClientOptions CommonStreamsOptions { get; set; } = new ApiClientOptions(SocketEndpoint);
 
     }
 }

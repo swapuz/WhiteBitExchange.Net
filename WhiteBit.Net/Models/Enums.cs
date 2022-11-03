@@ -233,4 +233,43 @@ namespace WhiteBit.Net.Models.Enums
         [EnumMember(Value = "depth_update")]
         OrderBook,
     }
+    public enum OrderBookSocketAggregationLevel
+    {
+        /// <summary>
+        /// no interval
+        /// </summary>
+        NoAggregation = 0,
+        /// <summary>
+        /// "0.1"
+        /// </summary>
+        To1stDecimalPlace = -1,
+        /// <summary>
+        /// "0.01"
+        /// </summary>
+        To2ndDecimalPlace = -2,
+        /// <summary>
+        /// "0.001"
+        /// </summary>
+        To3rdDecimalPlace = -3,
+        /// <summary>
+        /// "0.0001"
+        /// </summary>
+        To4thDecimalPlace = -4,
+        /// <summary>
+        /// "0.00001"
+        /// </summary>
+        To5thDecimalPlace = -5,
+        /// <summary>
+        /// "0.000001"
+        /// </summary>
+        To6thDecimalPlace = -6,
+        /// <summary>
+        /// "0.0000001"
+        /// </summary>
+        To7thDecimalPlace = -7,
+        /// <summary>
+        /// "0.00000001"
+        /// </summary>
+        To8thDecimalPlace = -8
+    }
 }

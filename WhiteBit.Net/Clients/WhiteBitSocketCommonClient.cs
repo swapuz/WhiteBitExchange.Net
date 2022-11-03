@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using CryptoExchange.Net;
@@ -21,8 +22,8 @@ namespace WhiteBit.Net.Clients
     {
         protected Log _log;
         protected WhiteBitSocketClient _whiteBitSocketClient;
-        public WhiteBitSocketCommonClient(Log log, WhiteBitSocketClient whiteBitSocketClient, WhiteBitSocketClientOptions options) :
-            base(options, options.SpotStreamsOptions)
+        protected WhiteBitSocketCommonClient(Log log, WhiteBitSocketClient whiteBitSocketClient, WhiteBitSocketClientOptions options) :
+            base(options, options.CommonStreamsOptions)
         {
             this._log = log;
             this._whiteBitSocketClient = whiteBitSocketClient;
@@ -152,6 +153,31 @@ namespace WhiteBit.Net.Clients
 
                     dataHandler(new KeyValuePair<string, IEnumerable<WhiteBitPublicTrade>>(rawTrades.Symbol, rawTrades.Body));
                 },
+                ct
+            );
+        }
+        public async Task<CallResult<UpdateSubscription>> SubscribeToOrderBook(
+            Action<WhiteBitSocketOrderBook> onUpdate,
+            string symbol,
+            int maxEntriesAmount = 100,
+            OrderBookSocketAggregationLevel aggregationLevel = OrderBookSocketAggregationLevel.NoAggregation,
+            CancellationToken ct = default)
+        {
+            string aggregationParam = aggregationLevel switch
+            {
+                OrderBookSocketAggregationLevel.NoAggregation => "0",
+                _ => Math.Pow(10, (double)aggregationLevel).ToString(CultureInfo.InvariantCulture)
+            };
+            return await SubscribeInternal(
+                new WhiteBitSocketRequest<object>(SocketOutgoingMethod.OrderBookSubscribe, new List<object>
+                {
+                    symbol,
+                    maxEntriesAmount,
+                    aggregationParam,
+                    true
+                }),
+                false,
+                onUpdate!,
                 ct
             );
         }
