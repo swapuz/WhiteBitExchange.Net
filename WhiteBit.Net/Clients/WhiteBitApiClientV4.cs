@@ -13,6 +13,7 @@ using CryptoExchange.Net.Objects;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using WhiteBit.Net.Clients.Options;
 using WhiteBit.Net.Helpers;
 using WhiteBit.Net.Interfaces;
 using WhiteBit.Net.Models.Enums;
@@ -49,7 +50,7 @@ namespace WhiteBit.Net.Clients
 
 
         #endregion
-        public WhiteBitApiClientV4(string name, BaseRestClientOptions options, RestApiClientOptions apiOptions, Log log, WhiteBitClient client) : base(name, options, apiOptions, log, client)
+        public WhiteBitApiClientV4(string name, WhiteBitClientOptions options, RestApiClientOptions apiOptions, Log log, WhiteBitClient client) : base(name, options, apiOptions, log, client)
         {
         }
 
