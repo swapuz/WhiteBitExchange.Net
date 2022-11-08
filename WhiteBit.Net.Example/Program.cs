@@ -7,6 +7,10 @@ using Microsoft.Extensions.Logging;
 using WhiteBit.Net.Models.Enums;
 using WhiteBit.Net.Models.Responses;
 using WhiteBit.Net.Models.Requests;
+using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using WhiteBit.Net.Clients;
+using WhiteBit.Net.Clients.Options;
 
 namespace WhiteBit.Net.Example
 {
@@ -14,13 +18,40 @@ namespace WhiteBit.Net.Example
     {
         private static async Task Main(string[] args)
         {
+            var cred = new ApiCredentials("key", "secret"); // <- Provide you API key/secret in these fields to retrieve data related to your account
+
             var cl = new WhiteBitClient(new WhiteBitClientOptions()
             {
-                ApiCredentials = new ApiCredentials("key", "secret"), // <- Provide you API key/secret in these fields to retrieve data related to your account
+                ApiCredentials =  cred,
                 LogLevel = LogLevel.Trace
             });
+            var socketClient = new WhiteBitSocketClient(new WhiteBitSocketClientOptions()
+            { 
+                ApiCredentials = cred,
+                LogLevel = LogLevel.Trace
+            });
+            var result = await socketClient.SpotStreams.SubscribeToActiveOrders(data =>
+            {
+                // foreach (var ordUpd in data)
+                // {
+                var order = data?.Order;
+                Console.WriteLine($"Order {data?.Action} with {JsonSerializer.Serialize(order).ToString()}");
+                // }
+            },
+            //     var result = await socket.SpotStreams.SubscribeToActiveOrders(data =>
+            //    {
+            //    var o = data?.Type == JTokenType.Object;
+            // foreach (var ordUpd in data)
+            //    var ds = data.ToObject<OrderSocketUpdate>();
+            // var order = data?.Order;
+            // Console.WriteLine($"Order {data?.Action} with {order?.Price} q-ty = {order?.Amount}");
+            // Console.WriteLine($"Order {data} with  q-ty = ");
+            // }
+            // },
+            default,
+            "DBTC_DUSDT", "BTC_USDT", "WAVES_USDT", "LINK_USDT");
             // var cl0 = (WhiteBitApiClientV4)cl.ApiClient;
-            var b0 = await cl.ApiClient.GetBalanceAsync("DBTC_DUS");
+            // var b0 = await cl.ApiClient.GetOrderTradesAsync(new GetOrderTradesRequest(1133469996));
             // var a0 = await cl.ApiClient.GetExecutedOrdersAsync();
             // var t0 = await cl.ApiClient.GetTickersAsync();
             // var time = await cl0.GetServerTimestampTest();

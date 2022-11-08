@@ -2,7 +2,7 @@ using CryptoExchange.Net;
 using CryptoExchange.Net.Logging;
 using CryptoExchange.Net.Objects;
 
-namespace WhiteBit.Net
+namespace WhiteBit.Net.Clients
 {
     public abstract class WhiteBitApiClient : RestApiClient
     {

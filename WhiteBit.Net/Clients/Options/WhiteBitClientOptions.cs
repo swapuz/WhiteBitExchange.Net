@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WhiteBit.Net
+namespace WhiteBit.Net.Clients.Options
 {
     public class WhiteBitClientOptions : BaseRestClientOptions
     {

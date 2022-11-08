@@ -33,7 +33,7 @@ namespace WhiteBit.Net.Interfaces
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
-        new Task<WebCallResult<IEnumerable<WhiteBitTicker>?>> GetTickersAsync(CancellationToken ct = default);
+        new Task<WebCallResult<IEnumerable<WhiteBitRestTicker>?>> GetTickersAsync(CancellationToken ct = default);
 
         /// <summary>
         /// This method retrieves the assets status.

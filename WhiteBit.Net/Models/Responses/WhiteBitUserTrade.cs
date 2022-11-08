@@ -19,7 +19,7 @@ namespace WhiteBit.Net.Models.Responses
         /// </summary>
         [JsonProperty("clientOrderId")]
         public string ClientOrderId { get; set; } = string.Empty;
-
+      
         /// <summary>
         /// Order ID
         /// </summary>
@@ -67,5 +67,28 @@ namespace WhiteBit.Net.Models.Responses
         //     The asset the fee is paid in
         private string? FeeAsset => Symbol?.Split('_').LastOrDefault();
         #endregion
+    }
+
+    [JsonConverter(typeof(ArrayConverter))]
+    internal class WhiteBitUserTradeAsArray : IConvertible<WhiteBitUserTrade>
+    {
+        [ArrayProperty(0)]
+        public long TradeId { get; set; }
+        [ArrayProperty(1)]
+        [JsonConverter(typeof(DateTimeConverter))]
+        public DateTime Timestamp {get; set; }
+        [ArrayProperty(2)]
+        public string? Symbol { get; set; }
+        [ArrayProperty(3)]
+        public long? OrderId { get; set; }
+        [ArrayProperty(4)]
+        public decimal Price { get;  set;}
+        [ArrayProperty(5)]
+        public decimal BaseVolume { get; set; }
+        [ArrayProperty(6)]
+        public decimal Fee { get; set; }
+        [ArrayProperty(7)]
+        public string? ClientOrderId { get; set; }
+        
     }
 }
