@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace WhiteBit.Net.Clients.Options
 {
-    public class WhiteBitClientOptions : BaseRestClientOptions
+    public class WhiteBitClientOptions : ClientOptions
     {
     }
 

@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <ProjectReference Include="../WhiteBit.Net/WhiteBit.Net.csproj" />
-    <PackageReference Include="CryptoExchange.Net" Version="5.2.4" />
   </ItemGroup>
 
 </Project>

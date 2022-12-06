@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using System.Text.Json;
 using WhiteBit.Net.Clients;
 using WhiteBit.Net.Clients.Options;
+using WhiteBit.Net.Models;
 
 namespace WhiteBit.Net.Example
 {
@@ -18,38 +19,38 @@ namespace WhiteBit.Net.Example
     {
         private static async Task Main(string[] args)
         {
-            var cred = new ApiCredentials("key", "secret"); // <- Provide you API key/secret in these fields to retrieve data related to your account
+            // var cred = new ApiCredentials("key", "secret"); // <- Provide you API key/secret in these fields to retrieve data related to your account
 
-            var cl = new WhiteBitClient(new WhiteBitClientOptions()
-            {
-                ApiCredentials =  cred,
-                LogLevel = LogLevel.Trace
-            });
+            // var cl = new WhiteBitClient(new WhiteBitClientOptions()
+            // {
+            //     ApiCredentials =  cred,
+            //     LogLevel = LogLevel.Trace
+            // });
             var socketClient = new WhiteBitSocketClient(new WhiteBitSocketClientOptions()
             { 
-                ApiCredentials = cred,
-                LogLevel = LogLevel.Trace
+                // ApiCredentials = cred,
             });
-            var result = await socketClient.SpotStreams.SubscribeToActiveOrders(data =>
-            {
-                // foreach (var ordUpd in data)
-                // {
-                var order = data?.Order;
-                Console.WriteLine($"Order {data?.Action} with {JsonSerializer.Serialize(order).ToString()}");
-                // }
-            },
-            //     var result = await socket.SpotStreams.SubscribeToActiveOrders(data =>
-            //    {
-            //    var o = data?.Type == JTokenType.Object;
-            // foreach (var ordUpd in data)
-            //    var ds = data.ToObject<OrderSocketUpdate>();
-            // var order = data?.Order;
-            // Console.WriteLine($"Order {data?.Action} with {order?.Price} q-ty = {order?.Amount}");
-            // Console.WriteLine($"Order {data} with  q-ty = ");
-            // }
+            // var result = await socketClient.SpotStreams.SubscribeToActiveOrders(data =>
+            // {
+            //     // foreach (var ordUpd in data)
+            //     // {
+            //     var order = data?.Order;
+            //     Console.WriteLine($"Order {data?.Action} with {JsonSerializer.Serialize(order).ToString()}");
+            //     // }
             // },
-            default,
-            "DBTC_DUSDT", "BTC_USDT", "WAVES_USDT", "LINK_USDT");
+            // //     var result = await socket.SpotStreams.SubscribeToActiveOrders(data =>
+            // //    {
+            // //    var o = data?.Type == JTokenType.Object;
+            // // foreach (var ordUpd in data)
+            // //    var ds = data.ToObject<OrderSocketUpdate>();
+            // // var order = data?.Order;
+            // // Console.WriteLine($"Order {data?.Action} with {order?.Price} q-ty = {order?.Amount}");
+            // // Console.WriteLine($"Order {data} with  q-ty = ");
+            // // }
+            // // },
+            // default,
+            // "DBTC_DUSDT", "BTC_USDT", "WAVES_USDT", "LINK_USDT");
+
             // var cl0 = (WhiteBitApiClientV4)cl.ApiClient;
             // var b0 = await cl.ApiClient.GetOrderTradesAsync(new GetOrderTradesRequest(1133469996));
             // var a0 = await cl.ApiClient.GetExecutedOrdersAsync();
@@ -71,7 +72,29 @@ namespace WhiteBit.Net.Example
             // var r0 = b0.Data.ToList();
             // var r1 = t0.Data.ToList();
             // var r = tr0.Data?.ToList();
+            var socketBook = new WhiteBitSpotSymbolOrderBook("BTC_USD", new WhiteBitOrderBookOptions() { LogLevel = LogLevel.Trace }, socketClient.SpotStreams);
+            socketBook.OnBestOffersChanged += S_OnBestOffersChanged;
+            await socketBook.StartAsync();
+            Thread.Sleep(30000);
+            await socketBook.StopAsync();
+            Thread.Sleep(5000);
+
+            await socketBook.StartAsync();
+
             Console.ReadLine();
+        }
+
+        static int c = 0;
+        private static void S_OnBestOffersChanged((CryptoExchange.Net.Interfaces.ISymbolOrderBookEntry BestBid, CryptoExchange.Net.Interfaces.ISymbolOrderBookEntry BestAsk) obj)
+        {
+            Console.WriteLine($"S_OnBestOffersChanged:{obj.BestAsk.Price}:{obj.BestBid.Price}");
+            c++;
+            if (c==20)
+            {
+                c = 0;
+                Console.WriteLine($"Changing bs:{obj.BestAsk.Price} to {obj.BestAsk.Price+50}");
+                obj.BestAsk.Price =+ 50;
+            }
         }
     }
 }

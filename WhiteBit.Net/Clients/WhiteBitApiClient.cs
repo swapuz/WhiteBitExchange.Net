@@ -1,20 +1,18 @@
 using CryptoExchange.Net;
 using CryptoExchange.Net.Logging;
 using CryptoExchange.Net.Objects;
+using WhiteBit.Net.Clients.Options;
 
 namespace WhiteBit.Net.Clients
 {
     public abstract class WhiteBitApiClient : RestApiClient
     {
         protected readonly WhiteBitClient baseClient;
-        protected readonly Log log;
 
-        protected WhiteBitApiClient(string name, BaseRestClientOptions options, RestApiClientOptions apiOptions, CryptoExchange.Net.Logging.Log log, WhiteBitClient client) : base(options, apiOptions)
+        protected WhiteBitApiClient(string name, WhiteBitClientOptions options, RestApiClientOptions apiOptions, CryptoExchange.Net.Logging.Log log, WhiteBitClient client) : base(log, options, apiOptions)
         {
             ExchangeName = name;
             baseClient = client;
-            this.log = log;
-
         }
         protected abstract string ApiVersion { get; }
         public string ExchangeName { get; }
@@ -43,6 +41,18 @@ namespace WhiteBit.Net.Clients
             }
             return path;
         }
-
+        protected async Task<WebCallResult<T>> SendRequestInternal<T>(
+               Uri uri,
+               HttpMethod method,
+               CancellationToken cancellationToken,
+               Dictionary<string, object>? parameters = null,
+               bool signed = false,
+               HttpMethodParameterPosition? postPosition = null,
+               ArrayParametersSerialization? arraySerialization = null,
+               int weight = 1
+           ) where T : class
+        {
+            return await base.SendRequestAsync<T>(uri, method, cancellationToken, parameters, signed, postPosition, arraySerialization, requestWeight: weight);
+        }
     }
 }
