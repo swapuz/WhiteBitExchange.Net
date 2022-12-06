@@ -50,7 +50,7 @@ namespace WhiteBit.Net.Clients
 
 
         #endregion
-        public WhiteBitApiClientV4(string name, WhiteBitClientOptions options, RestApiClientOptions apiOptions, Log log, WhiteBitClient client) : base(name, options, apiOptions, log, client)
+        internal WhiteBitApiClientV4(string name, WhiteBitClientOptions options, RestApiClientOptions apiOptions, Log log, WhiteBitClient client) : base(name, options, apiOptions, log, client)
         {
         }
 
