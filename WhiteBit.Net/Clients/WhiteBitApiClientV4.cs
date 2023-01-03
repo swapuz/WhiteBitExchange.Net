@@ -13,6 +13,7 @@ using CryptoExchange.Net.Objects;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using WhiteBit.Net.Clients.Options;
 using WhiteBit.Net.Helpers;
 using WhiteBit.Net.Interfaces;
 using WhiteBit.Net.Models.Enums;
@@ -49,7 +50,7 @@ namespace WhiteBit.Net.Clients
 
 
         #endregion
-        public WhiteBitApiClientV4(string name, BaseRestClientOptions options, RestApiClientOptions apiOptions, Log log, WhiteBitClient client) : base(name, options, apiOptions, log, client)
+        internal WhiteBitApiClientV4(string name, WhiteBitClientOptions options, RestApiClientOptions apiOptions, Log log, WhiteBitClient client) : base(name, options, apiOptions, log, client)
         {
         }
 
@@ -68,7 +69,7 @@ namespace WhiteBit.Net.Clients
             var result =  await SendRequestAsync<JToken>(WebsocketTokenUrl, ct);
             if (!result)
             {
-                log.Write(LogLevel.Error, $"Failed to get websocket token:\n {result.Error?.Message}");
+                _log.Write(LogLevel.Error, $"Failed to get websocket token:\n {result.Error?.Message}");
                 return null;
             }
             return result.Data["websocket_token"]!.ToString();
@@ -341,7 +342,7 @@ namespace WhiteBit.Net.Clients
         public override TimeSpan GetTimeOffset() => TimeSyncState.TimeOffset;
 
         /// <inheritdoc />
-        public override TimeSyncInfo GetTimeSyncInfo() => new TimeSyncInfo(log,Options.AutoTimestamp, Options.TimestampRecalculationInterval, TimeSyncState);
+        public override TimeSyncInfo GetTimeSyncInfo() => new TimeSyncInfo(_log,Options.AutoTimestamp, Options.TimestampRecalculationInterval, TimeSyncState);
 
         protected override async Task<WebCallResult<DateTime>> GetServerTimestampAsync()
         {
@@ -358,8 +359,7 @@ namespace WhiteBit.Net.Clients
         private async Task<WebCallResult<T>> SendRequestAsync<T>(string endpoint, CancellationToken ct = default, Dictionary<string, object>? request = null) where T : class
         {
             var isPublic = endpoint.IndexOf("public") > -1;
-            return await baseClient.SendRequestInternal<T>(
-                this,
+            return await SendRequestInternal<T>(
                 GetUrl(endpoint),
                 isPublic ? HttpMethod.Get : HttpMethod.Post,
                 ct,

@@ -23,19 +23,6 @@ namespace WhiteBit.Net.Clients
         public IWhiteBitApiClientV4 ApiClient { get; }
 
         public ISpotClient CommonSpotClient => ApiClient;
-        internal async Task<WebCallResult<T>> SendRequestInternal<T>(
-            RestApiClient apiClient,
-            Uri uri,
-            HttpMethod method,
-            CancellationToken cancellationToken,
-            Dictionary<string, object>? parameters = null,
-            bool signed = false,
-            HttpMethodParameterPosition? postPosition = null,
-            ArrayParametersSerialization? arraySerialization = null,
-            int weight = 1
-        ) where T : class
-        {
-            return await base.SendRequestAsync<T>(apiClient, uri, method, cancellationToken, parameters, signed, postPosition, arraySerialization, requestWeight: weight);
-        }
+   
     }
 }
