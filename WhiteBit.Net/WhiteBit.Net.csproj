@@ -4,8 +4,18 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ReleaseVersion>0.1.14</ReleaseVersion>
+    <Version>0.1.14</Version>
+		<FileVersion>0.1.14</FileVersion>
+		<PackageVersion>0.1.14</PackageVersion>
+		<AssemblyVersion>0.1.14</AssemblyVersion>
+		<Configurations>Release;Debug</Configurations>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
   <ItemGroup>
     <Folder Include="Objects\Socket\" />
   </ItemGroup>

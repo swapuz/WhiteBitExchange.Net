@@ -46,8 +46,12 @@ namespace WhiteBit.Net.Clients
         private const string OrderTradesUrl = "trade-account/order";
         private const string OwnTradesUrl = "trade-account/executed-history";
         private const string WebsocketTokenUrl = "profile/websocket_token";
-        
 
+        private const string DepositeAddress = "main-account/address";
+        private const string CreateDepositeAddress = "main-account/create-new-address";
+        private const string GetDepositeWsitrawalHistory = "main-account/history";
+        private const string WithdrawRequst = "main-account/withdraw";
+        private const string GetTransferRequest = "main-account/transfer";
 
         #endregion
         internal WhiteBitApiClientV4(string name, WhiteBitClientOptions options, RestApiClientOptions apiOptions, Log log, WhiteBitClient client) : base(name, options, apiOptions, log, client)
@@ -89,12 +93,13 @@ namespace WhiteBit.Net.Clients
         {
             var result = await SendRequestAsync<Dictionary<string, WhiteBitRawTradingBalance>>(BalanceUrl, ct);
             return result.As(result.Data?.Select(b => b.Value.Convert(new WhiteBitTradingBalance { Currency = b.Key })!));
+            
         }
 
         ///<inheritdoc/>
         public async Task<WebCallResult<IEnumerable<WhiteBitRestTicker>?>> GetTickersAsync(CancellationToken ct = default)
         {
-            var result =  await SendRequestAsync<Dictionary<string,WhiteBitRawRestTicker>>(TickerUrl, ct);
+            var result = await SendRequestAsync<Dictionary<string, WhiteBitRawRestTicker>>(TickerUrl, ct);
             return result.As(result.Data?.Select(b => b.Value.Convert(new WhiteBitRestTicker { Symbol = b.Key })!));
         }
 
@@ -208,6 +213,53 @@ namespace WhiteBit.Net.Clients
         {
             var result = await SendRequestAsync<WhiteBitPaginatedResponse<IEnumerable<WhiteBitUserTrade>>>(OrderTradesUrl, ct, request.AsDictionary());
             return result.As(result.Data?.Result);
+        }
+
+        ///<inheritdoc/>
+        public async Task<WebCallResult<GenerateNewAddress>> GetDepositeAddress (string symbol, string network = null,CancellationToken ct = default)
+        {
+            var requestParam = new Dictionary<string, object>();
+            requestParam.Add("ticker", symbol);
+            requestParam.Add("network", network);
+            return await SendRequestAsync<GenerateNewAddress>(DepositeAddress, ct, requestParam);
+        }
+
+        ///<inheritdoc/>
+        public async Task<WebCallResult<GenerateNewAddress>> GenerateNewAddress(string symbol, string network = null, CancellationToken ct = default)
+        {
+            var requestParam = new Dictionary<string, object>();
+            requestParam.Add("ticker", symbol);
+            requestParam.Add("network", network);
+            return await SendRequestAsync<GenerateNewAddress>(CreateDepositeAddress, ct, requestParam);
+        }
+        ///<inheritdoc/>
+        public async Task<WebCallResult<ResponseWithdrawError?>> WithdrawRequest(string syymbol,decimal amount,string address,string uniqueId, string memo = "",string network = "", CancellationToken ct = default)
+        {
+            var param = new Dictionary<string, object>();
+            param.Add("ticker", syymbol);
+            param.Add("amount", amount.ToString("G", CultureInfo.InvariantCulture));
+            param.Add("address", address);
+            if(!string.IsNullOrEmpty(memo))
+               param.Add("memo", memo);
+            param.Add("uniqueId", uniqueId);
+            param.Add("network", network);
+            return await SendRequestAsync<ResponseWithdrawError?>(WithdrawRequst, ct, param);
+        }
+        ///<inheritdoc/>
+        public async Task<WebCallResult<ResponseTransferAmountError?>> TransferAmount(string from,string to,string token,decimal amount,CancellationToken ct = default)
+        {
+            var param = new Dictionary<string, object>();
+            param.Add("ticker", token);
+            param.Add("from", from);
+            param.Add("to", to);
+            param.Add("amount", amount.ToString("G", CultureInfo.InvariantCulture));
+            return await SendRequestAsync<ResponseTransferAmountError?>(GetTransferRequest,ct,param);
+            
+        }
+        ///<inheritdoc/>
+        public async Task<WebCallResult<WhitdrawalDepositHistoryResponse>> GetDepositeWithdrawalHistory(WhitdrawalDepositHistoryRequest model,CancellationToken ct = default)
+        {
+            return await SendRequestAsync<WhitdrawalDepositHistoryResponse>(GetDepositeWsitrawalHistory, ct, model?.AsDictionary());
         }
         #endregion
 

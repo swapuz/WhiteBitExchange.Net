@@ -112,6 +112,50 @@ namespace WhiteBit.Net.Interfaces
         /// <param name="ct"></param>
         /// <returns></returns>This endpoint retrieves deals history details on pending or executed order.
         Task<WebCallResult<IEnumerable<WhiteBitUserTrade>?>> GetOrderTradesAsync(GetOrderTradesRequest request, CancellationToken ct = default);
-
+        /// <summary>
+        /// Generate new Address
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="network"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<WebCallResult<GenerateNewAddress>> GenerateNewAddress(string symbol, string network = null, CancellationToken ct = default);
+        /// <summary>
+        /// Get Deposite Adress
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="network"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<WebCallResult<GenerateNewAddress>> GetDepositeAddress(string symbol, string network = null, CancellationToken ct = default);
+        /// <summary>
+        /// Get Deposite and witdrawal history
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<WebCallResult<WhitdrawalDepositHistoryResponse>> GetDepositeWithdrawalHistory(WhitdrawalDepositHistoryRequest model, CancellationToken ct = default);
+        /// <summary>
+        ///  Wihthdrawal requst
+        /// </summary>
+        /// <param name="syymbol"></param>
+        /// <param name="amount"></param>
+        /// <param name="address"></param>
+        /// <param name="uniqueId"></param>
+        /// <param name="memo"></param>
+        /// <param name="network"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<WebCallResult<ResponseWithdrawError>> WithdrawRequest(string syymbol, decimal amount, string address, string uniqueId, string memo = "", string network = "", CancellationToken ct = default);
+        /// <summary>
+        /// transfer with account
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="token"></param>
+        /// <param name="amount"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<WebCallResult<ResponseTransferAmountError>> TransferAmount(string from, string to, string token, decimal amount, CancellationToken ct = default);
     }
 }

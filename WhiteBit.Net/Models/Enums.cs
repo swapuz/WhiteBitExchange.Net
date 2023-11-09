@@ -8,6 +8,25 @@ using Newtonsoft.Json.Converters;
 
 namespace WhiteBit.Net.Models.Enums
 {
+
+
+    public enum WhiteBitHistoryMode
+    {
+        Deposite = 1,
+        Withdrawal = 2,
+    }
+    public enum WhiteBitHistoryStatus
+    {
+        
+        Successful3 =3,
+        Successful7 = 7,
+        Canceled4 = 4,
+        Canceled9 = 4,
+        Unconfirmed = 5,
+        AML = 21,
+        Uncredited = 22,
+        Pending = 15
+    }
     /// <summary>
     /// The side of an order
     /// </summary>
