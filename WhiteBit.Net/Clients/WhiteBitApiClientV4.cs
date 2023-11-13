@@ -379,7 +379,7 @@ namespace WhiteBit.Net.Clients
         {
             WhiteBitPlaceOrderRequest request = type switch
             {
-                CommonOrderType.Market => WhiteBitPlaceOrderRequest.CreateStockMarketOrderRequest(symbol, side.ToWhiteBitOrderSide(), quantity, clientOrderId),
+                CommonOrderType.Market => WhiteBitPlaceOrderRequest.CreateMarketOrderRequest(symbol, side.ToWhiteBitOrderSide(), quantity, clientOrderId),
                 CommonOrderType.Limit when price is null => throw new ArgumentNullException("price should not be null for Limit order"),
                 CommonOrderType.Limit => WhiteBitPlaceOrderRequest.CreateLimitOrderRequest(symbol, side.ToWhiteBitOrderSide(), quantity, price!.Value, clientOrderId),
                 _ => throw new ArgumentException("Unsupported order type, use either Market or Limit")
