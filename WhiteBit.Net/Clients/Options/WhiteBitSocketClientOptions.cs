@@ -1,16 +1,19 @@
 using System;
 using CryptoExchange.Net.Objects;
+using CryptoExchange.Net.Objects.Options;
 
 namespace WhiteBit.Net.Clients.Options
 {
-    public class WhiteBitSocketClientOptions : ClientOptions
+    public class WhiteBitSocketClientOptions : SocketApiOptions
     {
         private const string SocketEndpoint = "wss://api.whitebit.com/ws";
 
-        public WhiteBitSocketClientOptions(SocketApiClientOptions? commonStreamsOptions = null) : base()
+        public WhiteBitSocketClientOptions(SocketApiOptions? commonStreamsOptions = null) : base()
         {
-            CommonStreamsOptions = commonStreamsOptions ?? new SocketApiClientOptions(SocketEndpoint);
-            CommonStreamsOptions.SocketSubscriptionsCombineTarget = 25;
+            //TODO
+            SocketApiOptions = commonStreamsOptions ?? new SocketApiOptions() { };
+            SocketApiOptions.MaxSocketConnections = 25;
+            SocketExchangeOptions = new SocketExchangeOptions() { };
         }
 
         /// <summary>
@@ -18,7 +21,9 @@ namespace WhiteBit.Net.Clients.Options
         /// </summary>
         public static WhiteBitSocketClientOptions Default { get; set; } = new WhiteBitSocketClientOptions();
 
-        public SocketApiClientOptions CommonStreamsOptions { get; set; }
-
+        public SocketApiOptions SocketApiOptions { get; set; }
+        public SocketExchangeOptions SocketExchangeOptions { get; set; }
+        public TimeSpan TimeOut { get; set; } = TimeSpan.FromSeconds(100);
+        public int Weight { get; set; } = 10;
     }
 }

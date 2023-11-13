@@ -4,11 +4,11 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <ReleaseVersion>0.1.14</ReleaseVersion>
-    <Version>0.1.14</Version>
-		<FileVersion>0.1.14</FileVersion>
-		<PackageVersion>0.1.14</PackageVersion>
-		<AssemblyVersion>0.1.14</AssemblyVersion>
+    <ReleaseVersion>0.1.15</ReleaseVersion>
+    <Version>0.1.15</Version>
+		<FileVersion>0.1.15</FileVersion>
+		<PackageVersion>0.1.15</PackageVersion>
+		<AssemblyVersion>0.1.15</AssemblyVersion>
 		<Configurations>Release;Debug</Configurations>
   </PropertyGroup>
 
@@ -21,7 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CryptoExchange.Net" Version="5.3.1" />
+    <PackageReference Include="CryptoExchange.Net" Version="6.2.0" />
   </ItemGroup>
 
 </Project>

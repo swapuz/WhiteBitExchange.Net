@@ -1,8 +1,8 @@
 using CryptoExchange.Net;
 using CryptoExchange.Net.Authentication;
-using CryptoExchange.Net.Logging;
 using CryptoExchange.Net.Objects;
 using CryptoExchange.Net.Sockets;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using WhiteBit.Net.Clients.Options;
 using WhiteBit.Net.Helpers;
@@ -16,8 +16,8 @@ namespace WhiteBit.Net.Clients
 {
     public class WhiteBitSocketClientMarginStream : WhiteBitSocketCommonClient, IWhiteBitSocketClientMarginStream
     {
-        internal WhiteBitSocketClientMarginStream(Log log, WhiteBitSocketClient whiteBitSocketClient, WhiteBitSocketClientOptions options) :
-            base(log, whiteBitSocketClient, options)
+        internal WhiteBitSocketClientMarginStream(ILogger Logger, WhiteBitSocketClient whiteBitSocketClient, WhiteBitSocketClientOptions options) :
+            base(Logger, whiteBitSocketClient, options)
         {
         }
         ///<inheritdoc/>

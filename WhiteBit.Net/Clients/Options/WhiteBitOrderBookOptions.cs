@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CryptoExchange.Net.Objects;
 using WhiteBit.Net.Models.Enums;
+using CryptoExchange.Net.Objects.Options;
 
 namespace WhiteBit.Net.Clients.Options
 {

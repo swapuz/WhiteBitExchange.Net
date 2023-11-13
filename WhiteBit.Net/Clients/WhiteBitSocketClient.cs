@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using CryptoExchange.Net;
 using CryptoExchange.Net.Authentication;
 using CryptoExchange.Net.Interfaces;
-using CryptoExchange.Net.Logging;
 using CryptoExchange.Net.Objects;
 using CryptoExchange.Net.Sockets;
 using Newtonsoft.Json.Linq;
@@ -28,7 +27,7 @@ namespace WhiteBit.Net.Clients
         /// <summary>
         /// Create a new instance of BinanceSocketClientSpot with default options
         /// </summary>
-        public WhiteBitSocketClient() : this(WhiteBitSocketClientOptions.Default)
+        public WhiteBitSocketClient() : this(WhiteBitSocketClientOptions.Default, null)
         {
         }
 
@@ -36,11 +35,11 @@ namespace WhiteBit.Net.Clients
         /// Create a new instance of BinanceSocketClientSpot using provided options
         /// </summary>
         /// <param name="options">The options to use for this client</param>
-        public WhiteBitSocketClient(WhiteBitSocketClientOptions options) : base("WhiteBit", options)
+        public WhiteBitSocketClient(WhiteBitSocketClientOptions options, ILoggerFactory? loggerFactory) : base(loggerFactory, "WhiteBit")
         {
             // RateLimitPerSocketPerSecond = 4;
-            SpotStreams = AddApiClient(new WhiteBitSocketClientSpotStream(log, this, options));
-            MarginStreams = AddApiClient(new WhiteBitSocketClientMarginStream(log, this, options));
+            SpotStreams = AddApiClient(new WhiteBitSocketClientSpotStream(_logger, this, options));
+            MarginStreams = AddApiClient(new WhiteBitSocketClientMarginStream(_logger, this, options));
         }
         #endregion 
         public IWhiteBitSocketClientSpotStream SpotStreams { get; set; }

@@ -1,18 +1,23 @@
 using CryptoExchange.Net;
-using CryptoExchange.Net.Logging;
 using CryptoExchange.Net.Objects;
+using Microsoft.Extensions.Logging;
 using WhiteBit.Net.Clients.Options;
 
 namespace WhiteBit.Net.Clients
 {
     public abstract class WhiteBitApiClient : RestApiClient
     {
-        protected readonly WhiteBitClient baseClient;
+        protected readonly WhiteBitRestClient baseClient;
 
-        protected WhiteBitApiClient(string name, WhiteBitClientOptions options, RestApiClientOptions apiOptions, CryptoExchange.Net.Logging.Log log, WhiteBitClient client) : base(log, options, apiOptions)
+        public WhiteBitRestClientOptions Options { get; set; }
+
+        private static readonly string baseAddress;
+
+        protected WhiteBitApiClient(string name, WhiteBitRestClientOptions options, RestApiClientOptions apiOptions, ILogger log, WhiteBitRestClient client) : base(log, null,baseAddress, options, apiOptions)
         {
             ExchangeName = name;
             baseClient = client;
+            Options = options;
         }
         protected abstract string ApiVersion { get; }
         public string ExchangeName { get; }

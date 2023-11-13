@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using CryptoExchange.Net.Objects;
 using CryptoExchange.Net.OrderBook;
 using CryptoExchange.Net.Sockets;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using WhiteBit.Net.Clients;
 using WhiteBit.Net.Clients.Options;
 using WhiteBit.Net.Interfaces;
@@ -45,8 +47,8 @@ namespace WhiteBit.Net.Models
 
         IWhiteBitSocketClientCommonStream _socketClient;
 
-        public WhiteBitCommonSymbolOrderBook(string symbol, WhiteBitOrderBookOptions? options = null, IWhiteBitSocketClientCommonStream? socketClientSteam = null)
-            : base("WhiteBit", symbol, options ?? WhiteBitOrderBookOptions.Default)
+        public WhiteBitCommonSymbolOrderBook(string symbol, WhiteBitOrderBookOptions? options = null, IWhiteBitSocketClientCommonStream? socketClientSteam = null, ILogger<WhiteBitCommonSymbolOrderBook> logger = null)
+            : base(logger, "WhiteBit", symbol)
         {
             var opt = options ?? WhiteBitOrderBookOptions.Default;
             _socketClient = socketClientSteam ?? ConstructNewSocketSteam();

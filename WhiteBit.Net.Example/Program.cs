@@ -1,7 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using WhiteBit.Net;
 using CryptoExchange.Net.Authentication;
-using CryptoExchange.Net.Logging;
 using CryptoExchange.Net.Objects;
 using Microsoft.Extensions.Logging;
 using WhiteBit.Net.Models.Enums;
@@ -29,7 +28,7 @@ namespace WhiteBit.Net.Example
             var socketClient = new WhiteBitSocketClient(new WhiteBitSocketClientOptions()
             { 
                 // ApiCredentials = cred,
-            });
+            },null);
             // var result = await socketClient.SpotStreams.SubscribeToActiveOrders(data =>
             // {
             //     // foreach (var ordUpd in data)
@@ -72,7 +71,7 @@ namespace WhiteBit.Net.Example
             // var r0 = b0.Data.ToList();
             // var r1 = t0.Data.ToList();
             // var r = tr0.Data?.ToList();
-            var socketBook = new WhiteBitSpotSymbolOrderBook("BTC_USD", new WhiteBitOrderBookOptions() { LogLevel = LogLevel.Trace }, socketClient.SpotStreams);
+            var socketBook = new WhiteBitSpotSymbolOrderBook("BTC_USD", new WhiteBitOrderBookOptions() { }, socketClient.SpotStreams);
             socketBook.OnBestOffersChanged += S_OnBestOffersChanged;
             await socketBook.StartAsync();
             Thread.Sleep(30000);

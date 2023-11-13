@@ -27,6 +27,9 @@ namespace WhiteBit.Net
                 }
             }
         }
+
+        public ApiCredentials Credentials { get;  set; }
+
         public WhiteBitAuthenticationProvider(ApiCredentials credentials) : base(credentials)
         {
         }

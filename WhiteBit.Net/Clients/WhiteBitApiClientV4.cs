@@ -8,7 +8,6 @@ using CryptoExchange.Net;
 using CryptoExchange.Net.Authentication;
 using CryptoExchange.Net.CommonObjects;
 using CryptoExchange.Net.Interfaces.CommonClients;
-using CryptoExchange.Net.Logging;
 using CryptoExchange.Net.Objects;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -54,7 +53,7 @@ namespace WhiteBit.Net.Clients
         private const string GetTransferRequest = "main-account/transfer";
 
         #endregion
-        internal WhiteBitApiClientV4(string name, WhiteBitClientOptions options, RestApiClientOptions apiOptions, Log log, WhiteBitClient client) : base(name, options, apiOptions, log, client)
+        internal WhiteBitApiClientV4(string name, WhiteBitRestClientOptions options, RestApiClientOptions apiOptions, ILogger log, WhiteBitRestClient client) : base(name, options, apiOptions, log, client)
         {
         }
 
@@ -73,7 +72,7 @@ namespace WhiteBit.Net.Clients
             var result =  await SendRequestAsync<JToken>(WebsocketTokenUrl, ct);
             if (!result)
             {
-                _log.Write(LogLevel.Error, $"Failed to get websocket token:\n {result.Error?.Message}");
+                //_log.Write(LogLevel.Error, $"Failed to get websocket token:\n {result.Error?.Message}");
                 return null;
             }
             return result.Data["websocket_token"]!.ToString();
@@ -391,10 +390,10 @@ namespace WhiteBit.Net.Clients
         #endregion
 
         #region RestApiClient methods
-        public override TimeSpan GetTimeOffset() => TimeSyncState.TimeOffset;
+        public override TimeSpan? GetTimeOffset() => TimeSyncState.TimeOffset;
 
         /// <inheritdoc />
-        public override TimeSyncInfo GetTimeSyncInfo() => new TimeSyncInfo(_log,Options.AutoTimestamp, Options.TimestampRecalculationInterval, TimeSyncState);
+        public override TimeSyncInfo GetTimeSyncInfo() => new TimeSyncInfo(_logger, Options.AutoTimestamp, Options.TimestampRecalculationInterval, TimeSyncState);
 
         protected override async Task<WebCallResult<DateTime>> GetServerTimestampAsync()
         {

@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using CryptoExchange.Net;
 using CryptoExchange.Net.Authentication;
-using CryptoExchange.Net.Logging;
 using CryptoExchange.Net.Objects;
 using CryptoExchange.Net.Sockets;
 using Microsoft.Extensions.Logging;
@@ -18,6 +17,7 @@ using WhiteBit.Net.Models;
 using WhiteBit.Net.Models.Enums;
 using WhiteBit.Net.Models.Requests;
 using WhiteBit.Net.Models.Responses;
+using CryptoExchange.Net;
 
 namespace WhiteBit.Net.Clients
 {
@@ -26,10 +26,12 @@ namespace WhiteBit.Net.Clients
         private static string? WebsocketToken;
         private static SemaphoreSlim WebSocketTokenSemaphore = new SemaphoreSlim(1, 1);
         protected WhiteBitSocketClient _whiteBitSocketClient;
+        private readonly WhiteBitSocketClientOptions _options;
 
-        protected WhiteBitSocketCommonClient(Log log, WhiteBitSocketClient whiteBitSocketClient, WhiteBitSocketClientOptions options) :
-            base(log, options, options.CommonStreamsOptions)
+        protected WhiteBitSocketCommonClient(ILogger log, WhiteBitSocketClient whiteBitSocketClient, WhiteBitSocketClientOptions options) :
+            base(log,"",options.SocketExchangeOptions, options.SocketApiOptions)
         {
+            _options = options; 
             this._whiteBitSocketClient = whiteBitSocketClient;
         }
 
@@ -212,9 +214,9 @@ namespace WhiteBit.Net.Clients
             ServerError? serverError = null;
             await socketConnection.SendAndWaitAsync(
                     new AuthorizeSocketRequest(
-                            NextId(),
+                            ExchangeHelpers.NextId(),
                             (await GetWebsocketToken(socketConnection.ApiClient.AuthenticationProvider))!),
-                            Options.SocketResponseTimeout,
+                            _options.TimeOut, null,_options.Weight,
                             data =>
                             {
                                 AuthorizeSocketResponse? result = null;
@@ -246,13 +248,13 @@ namespace WhiteBit.Net.Clients
             try
             {
                 await WebSocketTokenSemaphore.WaitAsync();
-                if (WebsocketToken is null)
+                if (WebsocketToken is null && authProvider is WhiteBitAuthenticationProvider authenticationProvider)
                 {
-                    using (var client = new WhiteBitClient(
-                        new WhiteBitClientOptions()
+                    using (var client = new WhiteBitRestClient(
+                        new WhiteBitRestClientOptions()
                         {
-                            ApiCredentials = authProvider.Credentials
-                        })
+                            ApiCredentials = authenticationProvider.Credentials
+                        }, null)
                     )
                     {
                         WebsocketToken = await ((WhiteBitApiClientV4)client.ApiClient).GetWebsocketToken();
@@ -287,7 +289,7 @@ namespace WhiteBit.Net.Clients
                 return false;
             }
             if (callResult.Success)
-                _log.Write(LogLevel.Trace, $"Socket {socketConnection.SocketId} Subscription completed");
+                _logger.LogInformation($"Socket {socketConnection.SocketId} Subscription completed");
             return true;
         }
 
@@ -319,8 +321,8 @@ namespace WhiteBit.Net.Clients
             var unSubReq = ((WhiteBitSocketRequest<object>)subscriptionToUnsub.Request!).Method.GetCorrespondingUnsubscribeMethod();
             if (unSubReq is null)
                 return false;
-            var request = new UnsubscribeRequest(NextId(), unSubReq.Value);
-            var result = await QueryAndWaitAsync<SocketStatusResult>(connection, request);
+            var request = new UnsubscribeRequest(ExchangeHelpers.NextId(), unSubReq.Value);
+            var result = await QueryAndWaitAsync<SocketStatusResult>(connection, request, _options.Weight);
             return result.Data?.Status == SubscriptionStatus.Success;
         }
 
@@ -332,7 +334,7 @@ namespace WhiteBit.Net.Clients
             Action<DataEvent<TUpdate>> onData,
             CancellationToken ct)
         {
-            request.Id = NextId();
+            request.Id = ExchangeHelpers.NextId();
             return await SubscribeAsync(url, request, null, authenticate, onData, ct);
         }
     }

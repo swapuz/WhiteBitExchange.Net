@@ -1,8 +1,8 @@
 using CryptoExchange.Net;
 using CryptoExchange.Net.Authentication;
-using CryptoExchange.Net.Logging;
 using CryptoExchange.Net.Objects;
 using CryptoExchange.Net.Sockets;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using WhiteBit.Net.Clients.Options;
 using WhiteBit.Net.Helpers;
@@ -16,7 +16,7 @@ namespace WhiteBit.Net.Clients
 {
     public class WhiteBitSocketClientSpotStream : WhiteBitSocketCommonClient, IWhiteBitSocketClientSpotStream
     {
-        internal WhiteBitSocketClientSpotStream(Log log, WhiteBitSocketClient whiteBitSocketClient, WhiteBitSocketClientOptions options) :
+        internal WhiteBitSocketClientSpotStream(ILogger log, WhiteBitSocketClient whiteBitSocketClient, WhiteBitSocketClientOptions options) :
             base(log, whiteBitSocketClient, options)
         {
         }
