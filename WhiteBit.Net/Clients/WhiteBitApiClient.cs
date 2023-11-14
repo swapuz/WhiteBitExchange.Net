@@ -10,17 +10,17 @@ namespace WhiteBit.Net.Clients
         protected readonly WhiteBitRestClient baseClient;
 
         public WhiteBitRestClientOptions Options { get; set; }
+        private const string _baseURL = " https://whitebit.com/api/";
+        private const string _ExchangeName = "WhiteBit";
 
-        private static readonly string baseAddress;
-
-        protected WhiteBitApiClient(string name, WhiteBitRestClientOptions options, RestApiClientOptions apiOptions, ILogger log, WhiteBitRestClient client) : base(log, null,baseAddress, options, apiOptions)
+        protected WhiteBitApiClient(string name, WhiteBitRestClientOptions options, RestApiClientOptions apiOptions, ILogger log, WhiteBitRestClient client) 
+            : base(log, null, _baseURL, options, apiOptions)
         {
-            ExchangeName = name;
             baseClient = client;
             Options = options;
         }
         protected abstract string ApiVersion { get; }
-        public string ExchangeName { get; }
+        public string ExchangeName { get; } = _ExchangeName;
 
         internal Uri GetUrl(string endpoint)
         {
