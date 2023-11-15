@@ -4,11 +4,11 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <ReleaseVersion>0.1.18</ReleaseVersion>
-    <Version>0.1.18</Version>
-		<FileVersion>0.1.18</FileVersion>
-		<PackageVersion>0.1.18</PackageVersion>
-		<AssemblyVersion>0.1.18</AssemblyVersion>
+    <ReleaseVersion>0.1.19</ReleaseVersion>
+    <Version>0.1.19</Version>
+		<FileVersion>0.1.19</FileVersion>
+		<PackageVersion>0.1.19</PackageVersion>
+		<AssemblyVersion>0.1.19</AssemblyVersion>
 		<Configurations>Release;Debug</Configurations>
   </PropertyGroup>
 
