@@ -416,6 +416,7 @@ namespace WhiteBit.Net.Clients
                 ct,
                 request,
                 AuthenticationProvider is not null,
+                null,
                 isPublic ? HttpMethodParameterPosition.InUri : HttpMethodParameterPosition.InBody
             );
         }

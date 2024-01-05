@@ -52,12 +52,13 @@ namespace WhiteBit.Net.Clients
                CancellationToken cancellationToken,
                Dictionary<string, object>? parameters = null,
                bool signed = false,
+               RequestBodyFormat? requestBodyFormat = null,
                HttpMethodParameterPosition? postPosition = null,
                ArrayParametersSerialization? arraySerialization = null,
                int weight = 1
            ) where T : class
         {
-            return await base.SendRequestAsync<T>(uri, method, cancellationToken, parameters, signed, postPosition, arraySerialization, requestWeight: weight);
+            return await base.SendRequestAsync<T>(uri, method, cancellationToken, parameters, signed, requestBodyFormat, postPosition, arraySerialization, requestWeight: weight);
         }
     }
 }

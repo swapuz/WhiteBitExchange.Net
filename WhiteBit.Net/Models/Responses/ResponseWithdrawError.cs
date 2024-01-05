@@ -9,19 +9,19 @@ namespace WhiteBit.Net.Models.Responses
 		[JsonProperty("message")]
 		public string Message { get; set; }
 		[JsonProperty("errors")]
-		public ErrorsModel Errors { get; set; }
+		public ErrorsModel? Errors { get; set; }
 		public class ErrorsModel
 		{
 			[JsonProperty("address")]
-			public List<string> Address { get; set; }
+			public List<string?>? Address { get; set; }
 			[JsonProperty("amount")]
-			public List<string> Amount { get; set; }
+			public List<string?>? Amount { get; set; }
 			[JsonProperty("ticker")]
-			public List<string> Ticker { get; set; }
+			public List<string?>? Ticker { get; set; }
 			[JsonProperty("uniqueId")]
-			public List<string> UniqueId { get; set; }
+			public List<string?>? UniqueId { get; set; }
 			[JsonProperty("memo")]
-			public List<string> Memo { get; set; }
+			public List<string?>? Memo { get; set; }
 
 
         }
