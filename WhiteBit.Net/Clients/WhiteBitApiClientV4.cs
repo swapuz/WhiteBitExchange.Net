@@ -50,6 +50,7 @@ namespace WhiteBit.Net.Clients
         private const string CreateDepositeAddress = "main-account/create-new-address";
         private const string GetDepositeWsitrawalHistory = "main-account/history";
         private const string WithdrawRequst = "main-account/withdraw";
+        private const string WithdrawPayRequst = "main-account/withdraw-pay";
         private const string GetTransferRequest = "main-account/transfer";
 
         #endregion
@@ -232,7 +233,7 @@ namespace WhiteBit.Net.Clients
             return await SendRequestAsync<GenerateNewAddress>(CreateDepositeAddress, ct, requestParam);
         }
         ///<inheritdoc/>
-        public async Task<WebCallResult<ResponseWithdrawError?>> WithdrawRequest(string syymbol,decimal amount,string address,string uniqueId, string memo = "",string network = "", CancellationToken ct = default)
+        public async Task<WebCallResult<ResponseWithdrawError?>> WithdrawRequest(string syymbol,decimal amount,string address,string uniqueId, string memo = "",string network = "",bool isFee =false, CancellationToken ct = default)
         {
             var param = new Dictionary<string, object>();
             param.Add("ticker", syymbol);
@@ -242,7 +243,12 @@ namespace WhiteBit.Net.Clients
                param.Add("memo", memo);
             param.Add("uniqueId", uniqueId);
             param.Add("network", network);
-            return await SendRequestAsync<ResponseWithdrawError?>(WithdrawRequst, ct, param);
+            var requestUrl = WithdrawRequst;
+            if (isFee)
+            {
+                requestUrl = WithdrawPayRequst;
+            }
+            return await SendRequestAsync<ResponseWithdrawError?>(requestUrl, ct, param);
         }
         ///<inheritdoc/>
         public async Task<WebCallResult<ResponseTransferAmountError?>> TransferAmount(string from,string to,string token,decimal amount,CancellationToken ct = default)

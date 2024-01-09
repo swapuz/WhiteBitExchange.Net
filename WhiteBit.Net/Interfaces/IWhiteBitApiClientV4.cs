@@ -146,7 +146,7 @@ namespace WhiteBit.Net.Interfaces
         /// <param name="network"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<WebCallResult<ResponseWithdrawError>> WithdrawRequest(string syymbol, decimal amount, string address, string uniqueId, string memo = "", string network = "", CancellationToken ct = default);
+        Task<WebCallResult<ResponseWithdrawError>> WithdrawRequest(string syymbol, decimal amount, string address, string uniqueId, string memo = "", string network = "", bool isFee = false, CancellationToken ct = default);
         /// <summary>
         /// transfer with account
         /// </summary>
