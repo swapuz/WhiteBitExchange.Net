@@ -157,5 +157,11 @@ namespace WhiteBit.Net.Interfaces
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<WebCallResult<ResponseTransferAmountError>> TransferAmount(string from, string to, string token, decimal amount, CancellationToken ct = default);
+        /// <summary>
+        /// Get fee tokens
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<WebCallResult<IEnumerable<WhiteBitAssetFee>?>> GetFeeAsync(CancellationToken ct = default);
     }
 }

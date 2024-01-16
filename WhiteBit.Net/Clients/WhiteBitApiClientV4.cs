@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CryptoExchange.Net;
 using CryptoExchange.Net.Authentication;
@@ -130,6 +131,17 @@ namespace WhiteBit.Net.Clients
         {
             var result =  await SendRequestAsync<BaseResponse<List<WhiteBitFutures>>>(FuturesListUrl, ct);
             return result.As(result.Data?.Result);
+        }
+        ///<inheritdoc/>
+        public async Task<WebCallResult<IEnumerable<WhiteBitAssetFee>?>> GetFeeAsync(CancellationToken ct = default)
+        {
+            var result = await SendRequestAsync< Dictionary <string, WhiteBitRawAssetFee >> (FeeUrl, ct);
+            var res =  result.As(result.Data?.Select(b => b.Value.Convert(new WhiteBitAssetFee
+            {
+                //Currency = b.Key,
+                Network = Regex.Replace(b.Key, @"\w+ (\(\w+\))","$1", RegexOptions.IgnoreCase).Replace("(","").Replace(")","")
+            })!));
+            return res;
         }
         ///<inheritdoc/>
         public async Task<WebCallResult<List<string>>> GetCollateralMarketsAsync(CancellationToken ct = default)
