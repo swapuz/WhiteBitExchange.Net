@@ -11,6 +11,10 @@ using System.Text.Json;
 using WhiteBit.Net.Clients;
 using WhiteBit.Net.Clients.Options;
 using WhiteBit.Net.Models;
+using WhiteBit.Net.Interfaces;
+using System.Net.Sockets;
+using System.Security;
+using CryptoExchange.Net.CommonObjects;
 
 namespace WhiteBit.Net.Example
 {
@@ -18,17 +22,22 @@ namespace WhiteBit.Net.Example
     {
         private static async Task Main(string[] args)
         {
+            var apikey = "803597747d5b814d1864f7c82a84134a";
+            var secret = "933558d38d6c1ff73f21d62cd76fe6c9";
+            var cl = new WhiteBitClientTests(apikey, secret);
+            await cl.ExecuteWithdrawTest();
+            //await Other();
+        }
+
+        private static async Task Other()
+        {
             // var cred = new ApiCredentials("key", "secret"); // <- Provide you API key/secret in these fields to retrieve data related to your account
 
-            // var cl = new WhiteBitClient(new WhiteBitClientOptions()
-            // {
-            //     ApiCredentials =  cred,
-            //     LogLevel = LogLevel.Trace
-            // });
+
             var socketClient = new WhiteBitSocketClient(new WhiteBitSocketClientOptions()
-            { 
+            {
                 // ApiCredentials = cred,
-            },null);
+            }, null);
             // var result = await socketClient.SpotStreams.SubscribeToActiveOrders(data =>
             // {
             //     // foreach (var ordUpd in data)
@@ -93,6 +102,43 @@ namespace WhiteBit.Net.Example
                 c = 0;
                 Console.WriteLine($"Changing bs:{obj.BestAsk.Price} to {obj.BestAsk.Price+50}");
                 obj.BestAsk.Price =+ 50;
+            }
+        }
+    }
+    public class WhiteBitClientTests
+    {
+        private readonly WhiteBitRestClient _client;
+
+        public WhiteBitClientTests(string ApiKey, string ApiSecret)
+        {
+            ApiCredentials cred;
+
+            cred = new ApiCredentials(ApiKey, ApiSecret);
+            var options = new WhiteBitRestClientOptions()
+            {
+                ApiCredentials = cred
+            };
+            _client = new WhiteBitRestClient(options, null);
+        }
+
+        public async Task ExecuteWithdrawTest()
+        {
+            //2742	487	1	100	10	"2023-03-14 08:25:16.028394"	"TJiVaRG1hNx4fVCN9TPZ29fKeoUnaC4ErJ"
+            string syymbol = "BTC";
+            decimal amount = 0.0011M;
+            string address = "bc1q44q8jdagmqdyu20x8zx29873auqgsncaycrqnu";
+            string uniqueId = "TJiZ29fKeoUnaC4ErJ0001";
+            string memo = "0001";
+            string network = "BTC";
+            //params
+            try
+            {
+                //                await _client.ApiClient.WithdrawRequest(order.To.Name, amount, order.AddressTo, withdraw.ID.ToString(), order.MemoTo, network);
+                var WebsocketToken = await _client.ApiClient.WithdrawRequest(syymbol, amount, address, uniqueId, memo, network);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
     }

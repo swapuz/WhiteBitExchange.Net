@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CryptoExchange.Net;
 using CryptoExchange.Net.Authentication;
 using CryptoExchange.Net.CommonObjects;
+using CryptoExchange.Net.Converters;
 using CryptoExchange.Net.Interfaces.CommonClients;
 using CryptoExchange.Net.Objects;
 using Microsoft.Extensions.Logging;
@@ -248,7 +249,8 @@ namespace WhiteBit.Net.Clients
             {
                 requestUrl = WithdrawPayRequst;
             }
-            return await SendRequestAsync<ResponseWithdrawError?>(requestUrl, ct, param);
+            var serializer = JsonSerializer.Create(DefaultSerializerSettings);
+            return await SendRequestAsync<ResponseWithdrawError?>(requestUrl, ct, param,serializer);
         }
         ///<inheritdoc/>
         public async Task<WebCallResult<ResponseTransferAmountError?>> TransferAmount(string from,string to,string token,decimal amount,CancellationToken ct = default)
@@ -413,7 +415,7 @@ namespace WhiteBit.Net.Clients
         }
         #endregion
         
-        private async Task<WebCallResult<T>> SendRequestAsync<T>(string endpoint, CancellationToken ct = default, Dictionary<string, object>? request = null) where T : class
+        private async Task<WebCallResult<T>> SendRequestAsync<T>(string endpoint, CancellationToken ct = default, Dictionary<string, object>? request = null, JsonSerializer serializer = null) where T : class
         {
             var isPublic = endpoint.IndexOf("public") > -1;
             return await SendRequestInternal<T>(
@@ -423,7 +425,10 @@ namespace WhiteBit.Net.Clients
                 request,
                 AuthenticationProvider is not null,
                 null,
-                isPublic ? HttpMethodParameterPosition.InUri : HttpMethodParameterPosition.InBody
+                isPublic ? HttpMethodParameterPosition.InUri : HttpMethodParameterPosition.InBody,
+                ArrayParametersSerialization.MultipleValues,
+                1,
+                serializer
             );
         }
     }

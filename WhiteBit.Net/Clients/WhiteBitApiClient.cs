@@ -1,6 +1,8 @@
 using CryptoExchange.Net;
 using CryptoExchange.Net.Objects;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using WhiteBit.Net.Clients.Options;
 
 namespace WhiteBit.Net.Clients
@@ -8,7 +10,12 @@ namespace WhiteBit.Net.Clients
     public abstract class WhiteBitApiClient : RestApiClient
     {
         protected readonly WhiteBitRestClient baseClient;
-
+        public JsonSerializerSettings DefaultSerializerSettings = new JsonSerializerSettings
+        {
+            Formatting = Formatting.Indented,
+            ContractResolver = new CamelCasePropertyNamesContractResolver(),
+            NullValueHandling = NullValueHandling.Ignore
+        };
         public WhiteBitRestClientOptions Options { get; set; }
         private const string _baseURL = " https://whitebit.com/api/";
         private const string _ExchangeName = "WhiteBit";
@@ -55,10 +62,11 @@ namespace WhiteBit.Net.Clients
                RequestBodyFormat? requestBodyFormat = null,
                HttpMethodParameterPosition? postPosition = null,
                ArrayParametersSerialization? arraySerialization = null,
-               int weight = 1
+               int weight = 1,
+               JsonSerializer? deserializer = null
            ) where T : class
         {
-            return await base.SendRequestAsync<T>(uri, method, cancellationToken, parameters, signed, requestBodyFormat, postPosition, arraySerialization, requestWeight: weight);
+            return await base.SendRequestAsync<T>(uri, method, cancellationToken, parameters, signed, requestBodyFormat, postPosition, arraySerialization, requestWeight: weight, deserializer);
         }
     }
 }
