@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Security.Principal;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CryptoExchange.Net;
@@ -10,6 +11,7 @@ using CryptoExchange.Net.Authentication;
 using CryptoExchange.Net.CommonObjects;
 using CryptoExchange.Net.Interfaces.CommonClients;
 using CryptoExchange.Net.Objects;
+using CryptoExchange.Net.Requests;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -34,7 +36,7 @@ namespace WhiteBit.Net.Clients
         private const string ServerPingUrl = "public/ping";
         private const string FuturesListUrl = "public/futures";
         private const string CollateralMarketsUrl = "public/collateral/markets";
-        private const string BalanceUrl = "trade-account/balance";
+        private const string BalanceUrl = "trade-account/balance";//
         private const string PlaceLimitOrderUrl = "order/new";
         private const string PlaceStopLimitOrderUrl = "order/stop_limit";
         private const string PlaceMarketOrderUrl = "order/market";
@@ -53,6 +55,9 @@ namespace WhiteBit.Net.Clients
         private const string WithdrawRequst = "main-account/withdraw";
         private const string WithdrawPayRequst = "main-account/withdraw-pay";
         private const string GetTransferRequest = "main-account/transfer";
+        private const string AccountBalanceSummary = "collateral-account/balance-summary";
+        //Collateral Account Balance Summary
+        //[POST] /api/v4/
 
         #endregion
         internal WhiteBitApiClientV4(string name, WhiteBitRestClientOptions options, RestApiClientOptions apiOptions, ILogger log, WhiteBitRestClient client) : base(name, options, apiOptions, log, client)
@@ -96,7 +101,19 @@ namespace WhiteBit.Net.Clients
             return result.As(result.Data?.Select(b => b.Value.Convert(new WhiteBitTradingBalance { Currency = b.Key })!));
             
         }
-
+        ///<inheritdoc/>
+        public async Task<WebCallResult<IEnumerable<AccountBalanceSummaryItemResponse>?>> GetAccountBalanceSummaryAsync(AccountBalanceSummaryRequest request = null,  CancellationToken ct = default)
+        {
+            var param = new Dictionary<string, object>();
+            if(request != null)
+            {
+                param.Add("nonce", request.Nonce);
+                param.Add("ticker", request.Ticker);
+                param.Add("request", request.Request);
+            }
+            var result = await SendRequestAsync<IEnumerable<AccountBalanceSummaryItemResponse>?>(AccountBalanceSummary, ct, param);
+            return result.As(result.Data);
+        }
         ///<inheritdoc/>
         public async Task<WebCallResult<IEnumerable<WhiteBitRestTicker>?>> GetTickersAsync(CancellationToken ct = default)
         {

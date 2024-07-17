@@ -38,5 +38,5 @@ namespace WhiteBit.Net.Models.Responses
         /// </summary>
         [JsonProperty("freeze")]
         public decimal Freeze { get; set; }
-    }
+    } 
 }
