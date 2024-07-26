@@ -163,5 +163,6 @@ namespace WhiteBit.Net.Interfaces
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<WebCallResult<IEnumerable<WhiteBitAssetFee>?>> GetFeeAsync(CancellationToken ct = default);
+        Task<WebCallResult<IEnumerable<AccountBalanceSummaryItemResponse>?>> GetAccountBalanceSummaryAsync(AccountBalanceSummaryRequest request = null, CancellationToken ct = default);
     }
 }
