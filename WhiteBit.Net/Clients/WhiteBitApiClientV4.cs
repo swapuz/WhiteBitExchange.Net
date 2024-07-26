@@ -101,19 +101,18 @@ namespace WhiteBit.Net.Clients
             return result.As(result.Data?.Select(b => b.Value.Convert(new WhiteBitTradingBalance { Currency = b.Key })!));
             
         }
+
         ///<inheritdoc/>
-        public async Task<WebCallResult<IEnumerable<AccountBalanceSummaryItemResponse>?>> GetAccountBalanceSummaryAsync(AccountBalanceSummaryRequest request = null,  CancellationToken ct = default)
+        public async Task<WebCallResult<IEnumerable<AccountBalanceSummaryItemResponse>>> GetAccountBalanceSummaryAsync(
+            string sumbols, CancellationToken ct = default)
         {
-            var param = new Dictionary<string, object>();
-            if(request != null)
-            {
-                param.Add("nonce", request.Nonce);
-                param.Add("ticker", request.Ticker);
-                param.Add("request", request.Request);
-            }
-            var result = await SendRequestAsync<IEnumerable<AccountBalanceSummaryItemResponse>?>(AccountBalanceSummary, ct, param);
+            
+            var result =
+                await SendRequestAsync<IEnumerable<AccountBalanceSummaryItemResponse>>(AccountBalanceSummary, ct,
+                    new Dictionary<string, object> { { "ticker", sumbols } });
             return result.As(result.Data);
         }
+
         ///<inheritdoc/>
         public async Task<WebCallResult<IEnumerable<WhiteBitRestTicker>?>> GetTickersAsync(CancellationToken ct = default)
         {
