@@ -1,14 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <ReleaseVersion>0.1.24</ReleaseVersion>
-    <Version>0.1.24</Version>
-		<FileVersion>0.1.24</FileVersion>
-		<PackageVersion>0.1.24</PackageVersion>
-		<AssemblyVersion>0.1.24</AssemblyVersion>
+    <ReleaseVersion>0.1.25</ReleaseVersion>
+    <Version>0.1.25</Version>
+		<FileVersion>0.1.25</FileVersion>
+		<PackageVersion>0.1.25</PackageVersion>
+		<AssemblyVersion>0.1.25</AssemblyVersion>
 		<Configurations>Release;Debug</Configurations>
   </PropertyGroup>
 
