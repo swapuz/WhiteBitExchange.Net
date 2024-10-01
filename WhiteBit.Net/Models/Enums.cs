@@ -71,7 +71,9 @@ namespace WhiteBit.Net.Models.Enums
         [EnumMember(Value = "margin trigger-stop market")]
         MarginTriggerStopMarket = 10,
         [EnumMember(Value = "stock market")]
-        StockMarket
+        StockMarket,
+        [EnumMember(Value = "market stock")]
+        MarketStock = 202	
     }
 
     /// <summary>
