@@ -72,8 +72,10 @@ namespace WhiteBit.Net.Models.Enums
         MarginTriggerStopMarket = 10,
         [EnumMember(Value = "stock market")]
         StockMarket,
+        [EnumMember(Value = "Margin normalization")]
+        MarginNormalization = 14,
         [EnumMember(Value = "market stock")]
-        MarketStock = 202	
+        MarketStock = 202
     }
 
     /// <summary>
