@@ -62,14 +62,22 @@ namespace WhiteBit.Net.Models.Enums
         StopMarket = 4,
         ConditionalLimit = 5,
         ConditionalMarket = 6,
+        [EnumMember(Value = "margin limit")]
         MarginLimit = 7,
+        [EnumMember(Value = "margin market")]
         MarginMarket = 8,
+        [EnumMember(Value = "margin stop limit")]
         MarginTriggerStopLimit = 9,
+        [EnumMember(Value = "margin trigger-stop market")]
         MarginTriggerStopMarket = 10,
         [EnumMember(Value = "stock market")]
-        StockMarket
+        StockMarket,
+        [EnumMember(Value = "Margin normalization")]
+        MarginNormalization = 14,
+        [EnumMember(Value = "market stock")]
+        MarketStock = 202
     }
-    
+
     /// <summary>
     /// If new order instantly matches an order from orderbook,
     /// then you will receive only one message with update event ID equal to 3.
