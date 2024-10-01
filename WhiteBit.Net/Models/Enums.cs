@@ -63,6 +63,7 @@ namespace WhiteBit.Net.Models.Enums
         ConditionalLimit = 5,
         ConditionalMarket = 6,
         MarginLimit = 7,
+        [EnumMember(Value = "margin market")]
         MarginMarket = 8,
         MarginTriggerStopLimit = 9,
         MarginTriggerStopMarket = 10,
