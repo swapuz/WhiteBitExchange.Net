@@ -14,6 +14,13 @@ namespace WhiteBit.Net.Interfaces
     public interface IWhiteBitApiClientV4:ISpotClient
     {
         /// <summary>
+        /// retrieves the main balance by currency ticker.
+        /// </summary>
+        /// <param name="currency">Currency's ticker. Example: BTC</param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<WebCallResult<WhiteBitMainBalance?>> GetMainBalanceAsync(string currency, CancellationToken ct = default);
+        /// <summary>
         /// retrieves the trade balance by currency ticker.
         /// </summary>
         /// <param name="currency">Currency's ticker. Example: BTC</param>
