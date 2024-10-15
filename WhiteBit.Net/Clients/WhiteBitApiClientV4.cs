@@ -53,6 +53,7 @@ namespace WhiteBit.Net.Clients
         private const string CreateDepositeAddress = "main-account/create-new-address";
         private const string GetDepositeWsitrawalHistory = "main-account/history";
         private const string WithdrawRequst = "main-account/withdraw";
+        private const string MainBalanceRequst = "main-account/balance";
         private const string WithdrawPayRequst = "main-account/withdraw-pay";
         private const string GetTransferRequest = "main-account/transfer";
         private const string AccountBalanceSummary = "collateral-account/balance-summary";
@@ -93,7 +94,12 @@ namespace WhiteBit.Net.Clients
             var result =  await SendRequestAsync<WhiteBitRawTradingBalance>(BalanceUrl, ct, new Dictionary<string, object>{{"ticker", currency}});
             return result.As(result.Data.Convert(new WhiteBitTradingBalance {Currency = currency}));
         }
-        
+        public async Task<WebCallResult<WhiteBitMainBalance?>> GetMainBalanceAsync(string currency, CancellationToken ct = default)
+        {
+            currency = currency.ToUpper();
+            var result = await SendRequestAsync<WhiteBitRawMainBalance>(MainBalanceRequst, ct, new Dictionary<string, object> { { "ticker", currency } });
+            return result.As(result.Data.Convert(new WhiteBitMainBalance { Currency = currency }));
+        }
         ///<inheritdoc/>
         public async Task<WebCallResult<IEnumerable<WhiteBitTradingBalance>?>> GetBalancesAsync(CancellationToken ct = default)
         {
