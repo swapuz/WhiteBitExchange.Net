@@ -9,6 +9,29 @@ using WhiteBit.Net.Interfaces;
 
 namespace WhiteBit.Net.Models.Responses
 {
+    public class WhiteBitMainBalance : WhiteBitRawMainBalance, IConvertible<Balance>
+    {
+
+        /// <summary>
+        /// Currency
+        /// </summary>
+        public string? Currency { get; set; }
+
+
+        #region IBaseRestClient
+        private string? Asset => Currency;
+        private decimal? Total => Available;
+        #endregion
+    }
+    public class WhiteBitRawMainBalance : IConvertible<WhiteBitMainBalance>
+    {
+
+        /// <summary>
+        /// Available balance of currency for transfer
+        /// </summary>
+        [JsonProperty("main_balance")]
+        public decimal Available { get; set; }
+    }
     public class WhiteBitTradingBalance : WhiteBitRawTradingBalance, IConvertible<Balance>
     {
 

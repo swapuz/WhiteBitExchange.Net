@@ -19,7 +19,7 @@ namespace WhiteBit.Net.Interfaces
         /// <param name="currency">Currency's ticker. Example: BTC</param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<WebCallResult<WhiteBitTradingBalance?>> GetMainBalanceAsync(string currency, CancellationToken ct = default);
+        Task<WebCallResult<WhiteBitMainBalance?>> GetMainBalanceAsync(string currency, CancellationToken ct = default);
         /// <summary>
         /// retrieves the trade balance by currency ticker.
         /// </summary>
