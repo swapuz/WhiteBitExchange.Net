@@ -1,6 +1,7 @@
 using CryptoExchange.Net;
 using CryptoExchange.Net.Objects;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
 using WhiteBit.Net.Clients.Options;
 
 namespace WhiteBit.Net.Clients
@@ -59,6 +60,24 @@ namespace WhiteBit.Net.Clients
            ) where T : class
         {
             return await base.SendRequestAsync<T>(uri, method, cancellationToken, parameters, signed, requestBodyFormat, postPosition, arraySerialization, requestWeight: weight);
+        }
+
+        private static readonly object nonceLock = new object();
+        private static long lastNonce;
+        internal static string Nonce
+        {
+            get
+            {
+                lock (nonceLock)
+                {
+                    var nonce = (long)Math.Round((DateTime.UtcNow - DateTime.UnixEpoch).TotalMilliseconds);
+                    if (nonce <= lastNonce)
+                        nonce++;
+
+                    lastNonce = nonce;
+                    return lastNonce.ToString(CultureInfo.InvariantCulture);
+                }
+            }
         }
     }
 }

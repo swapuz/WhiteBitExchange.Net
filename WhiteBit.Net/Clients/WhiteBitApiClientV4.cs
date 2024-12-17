@@ -174,6 +174,21 @@ namespace WhiteBit.Net.Clients
         public async Task<WebCallResult<WhiteBitOrder>> PlaceOrderAsync(WhiteBitPlaceOrderRequest parameters ,CancellationToken ct = default)
         {
             var requestParam = parameters.AsDictionary();
+            switch (parameters.Type)
+            {
+                case WhiteBitOrderType.Market:
+                case WhiteBitOrderType.StopMarket:
+                case WhiteBitOrderType.ConditionalMarket:
+                case WhiteBitOrderType.MarginMarket:
+                case WhiteBitOrderType.MarginTriggerStopMarket:
+                case WhiteBitOrderType.StockMarket:
+                case WhiteBitOrderType.MarketStock:
+                    requestParam.Add("nonce", Nonce);
+                    break;
+                default:
+                    requestParam.Add("nonce", Nonce);//TODO just for test
+                    break;
+            }
             var result =  parameters.Type switch
             {
                 WhiteBitOrderType.Limit => await SendRequestAsync<WhiteBitOrder>(PlaceLimitOrderUrl, ct, requestParam),
