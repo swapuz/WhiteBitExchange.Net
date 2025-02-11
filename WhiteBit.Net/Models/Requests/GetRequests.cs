@@ -31,7 +31,6 @@ namespace WhiteBit.Net.Models.Requests
 
         [JsonProperty("clientOrderId")]
         public string? ClientOrderId { get; private set; }
-
     }
 
     public class GetActiveOrdersRequest : BaseGetRequest
@@ -50,6 +49,12 @@ namespace WhiteBit.Net.Models.Requests
     public class GetExecutedOrdersRequest : BaseGetRequest
     {
         /// <summary>
+        /// Possible values: “ALL”, “FILLED”, “CANCELED”, “PARTIALLY_FILLED”
+        /// </summary>
+        [JsonProperty("status")]
+        public string? Status { get; set; }
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="symbol">Available market. Example: BTC_USDT</param>
@@ -57,8 +62,10 @@ namespace WhiteBit.Net.Models.Requests
         /// <param name="clientOrderId">Available clientOrderId. Example: customId11</param>
         /// <param name="limit">LIMIT is a special clause used to limit records a particular query can return. Default: 50, Min: 1, Max: 100</param>
         /// <param name="offset">If you want the request to return entries starting from a particular line, you can use OFFSET clause to tell it where it should start. Default: 0, Min: 0, Max: 10000</param>
-        public GetExecutedOrdersRequest(string? symbol = null, long? orderId = null, string? clientOrderId = null, int? limit = null, int? offset = null) : base(symbol, orderId, clientOrderId, limit, offset)
-        {}
+        public GetExecutedOrdersRequest(string? symbol = null, long? orderId = null, string? clientOrderId = null, int? limit = null, int? offset = null, string? status = null) : base(symbol, orderId, clientOrderId, limit, offset)
+        {
+            Status = status;
+        }
     }
     public class GetOrderTradesRequest : BaseGetRequest
     {
