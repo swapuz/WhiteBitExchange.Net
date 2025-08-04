@@ -54,6 +54,10 @@ namespace WhiteBit.Net.Models.Requests
         [JsonProperty("status")]
         public string? Status { get; set; }
 
+        [JsonProperty("startDate")]
+        public int? StartDate { get; set; }
+        [JsonProperty("endDate")]
+        public int? EndDate { get; set; }
         /// <summary>
         /// 
         /// </summary>
@@ -62,9 +66,13 @@ namespace WhiteBit.Net.Models.Requests
         /// <param name="clientOrderId">Available clientOrderId. Example: customId11</param>
         /// <param name="limit">LIMIT is a special clause used to limit records a particular query can return. Default: 50, Min: 1, Max: 100</param>
         /// <param name="offset">If you want the request to return entries starting from a particular line, you can use OFFSET clause to tell it where it should start. Default: 0, Min: 0, Max: 10000</param>
-        public GetExecutedOrdersRequest(string? symbol = null, long? orderId = null, string? clientOrderId = null, int? limit = null, int? offset = null, string? status = null) : base(symbol, orderId, clientOrderId, limit, offset)
+        /// <param name="startDate">Start date in Unix-time format</param>
+        /// <param name="endDate">End date in Unix-time format</param>
+        public GetExecutedOrdersRequest(string? symbol = null, long? orderId = null, string? clientOrderId = null, int? limit = null, int? offset = null, string? status = null,int? startDate =null,int? endDate = null) : base(symbol, orderId, clientOrderId, limit, offset)
         {
             Status = status;
+            StartDate = startDate;
+            EndDate = endDate;
         }
     }
     public class GetOrderTradesRequest : BaseGetRequest
