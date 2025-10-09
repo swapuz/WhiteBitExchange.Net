@@ -1,10 +1,11 @@
+using CryptoExchange.Net.Attributes;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace WhiteBit.Net.Models.Enums
 {
@@ -74,6 +75,8 @@ namespace WhiteBit.Net.Models.Enums
         StockMarket,
         [EnumMember(Value = "Margin normalization")]
         MarginNormalization = 14,
+        [EnumMember(Value = "normalization")]
+        CollateralNormalization = 14,
         [EnumMember(Value = "market stock")]
         MarketStock = 202
     }
